@@ -1,0 +1,13 @@
+
+# Ignore the usual stuff
+
+*.pyc
+
+# Ignore the pelican output directory
+diary/
+
+# Ignore the default MATLAB html output directory
+MATLAB/html/*
+
+# Ignore sublime text workspace files 
+*.sublime-workspace

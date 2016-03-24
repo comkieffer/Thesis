@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+
+    <head> 
+        {{ matlab_styles }}
+
+        <!-- Our Styles -->
+        <style>
+            body { background-color: #666666; }
+
+            .content_wrapper { 
+                max-width: 1280px; 
+                margin: 20px auto; 
+
+                overflow: hidden;
+                border-radius: 5px; 
+            }
+
+            .content_row {
+                background-color: #fff;
+                width: 100%;
+                border-bottom: solid 1px #CCCCCC;
+            }
+
+            .pane {
+                box-sizing: border-box;
+                float: left;
+                width: 50%;
+            }
+
+            .pane:first-child { padding: 20px 10px 20px 20px; }
+            .pane:last-child  { padding: 20px 20px 10px 20px; }
+
+            .clearfix       { overflow: auto; }
+            .clearfix:after { clear:both; }
+
+            .LineNodeBlock.contiguous { overflow: auto;  }
+        </style>
+    </head> 
+    <body> 
+    <div class="content_wrapper">
+    {% for section in sections %}
+        <div class="content_row clearfix">
+            <div class="pane">{{ section['input'] }}</div>
+            <div class="pane">{{ section['output'] }}</div>
+        </div>
+    {% endfor %}
+    </div>
+    </body> 
+</html>

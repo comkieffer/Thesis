@@ -1,0 +1,109 @@
+Trying to make shit work 
+========================
+
+:date: 2016-03-16
+
+Consider a simple case: 
+
+.. math::
+
+    C(z; \theta) = \frac{\theta_0 + \theta_1 z^{-1}}{1 - z^{-1}} 
+                 = \frac{\theta_0}{1 - z^{-1}} + \frac{\theta_1 z^{-1}}{1 - z^{-1}}
+
+I would expect to write this as:
+
+.. code-block:: matlab
+
+    c1 =    1 / (1 - z^-1);  c1.Variable = 'z^-1';
+    c2 = z^-1 / (1 - z^-1);  c2.Variable = 'z^-1';  
+    Controller = [c1; c2];
+
+Then to calculate the optimal controller (:math`C(z) = \beta^T(z) \cdot {\theta_n}^T`), assuming :math:`\underline{\theta} = \left| 1,1 \right|` I would write: 
+
+.. code-block:: matlab
+
+    theta = ones(2, 1);
+    OptimalController = Controller' * theta; 
+
+The expected result is:
+
+.. math::
+
+    \dfrac{1}{1 - z^{-1}} + \dfrac{z^{-1}}{1 - z^{-1}}
+
+Instead I get: 
+
+.. math::
+
+    \dfrac{1 - z^{-2}}{1 - 2 \cdot z^{-1} + z^{-2}} = \dfrac{-1 + z^{-2}}{\left( 1 - z^{-1} \right)^2}
+
+This happens because MATLAB is dumb. This is the process it follows: 
+
+.. math::
+
+    \begin{aligned} 
+        C(z; \theta) &= \begin{bmatrix}
+            \dfrac{-1}{1 - z^{-1}} \quad \dfrac{-z^{-1}}{1 - z^{-1}}
+        \end{bmatrix} \
+        \cdot \
+        \begin{bmatrix} \
+            1 \\
+            1
+        \end{bmatrix} \\
+        &= \dfrac{-z^{-1}}{1 - z^{-1}} + \dfrac{-1}{1 - z^{-1}} \\
+        &= \dfrac{-z^{-1} \left(1 - z^{-1} \right) - 1 \left(1 - z^{-1} \right)}{\left( 1 - z^{-1} \right)^2} \\
+        &= \dfrac{-1 + z^{-2}}{\left( 1 - z^{-1} \right)^2}
+    \end{aligned}
+
+Now things start to make sense: 
+
+..math::
+
+    (1 - z^{-1})^6 = 1 - 6 \cdot z^{-1} + 15 \cdot z^{-2} - 20 \cdot z^{-3} + 15 \cdot z^{-4} -6 \cdot z^{-5} + \cdot z^{-6} 
+
+Which is the :math:`z^{-4} \cdot Denominator`.
+
+Weird stuff: 
+************
+
+Why does 
+
+.. code-block:: matlab
+
+    z = tf('z', .05);
+    c = 1 / (1 - z^-1);
+
+Become :math:`\dfrac{-1}{1 - z^{-1}}` instead of :math:`\dfrac{1}{1 - z^{-1}}` ?
+
+This happens because ``Controller'`` return the **conjugate transpose** instead of the **transpose**. The transpose operation is actually ``.'``.
+
+Questions to ask 
+****************
+
+MATLAB doesn't do the smart sum of the parts of the controller which makes it harder to extract the parameter vector. We can only retrieve the raw controller. Using the example in the paper we can calculate a controller of the form :math:`\frac{p(z)}{\left(1 - z^{-1}\right)^6}` but what we really want is a controller of the form :math:`\frac{p^*(z)}{1 - z^{-1}}`. 
+
+How can we convert from one to the other? Do we need to bring the controller into canonical form ?
+
+Since the ``canon()`` and ``minreal()`` forms are the same I'm not sure how to proceed. 
+
+I've tried it by identification by hand but the results don't seem to match so I'm not sure what to do from there ... 
+
+Also, in the paper, the Bode plots always refer to the control system. I assume that means the closed-loop control system. Am I right ?
+
+Progress today: 
+***************
+
+I don't know shit. 
+
+I wanted to check that my script was correctly implementing VRFT. To do that I needed to validate that the outputs of the ``VRFT1_dy`` function were the same as the solution provided by the paper. Since the forms of the controllers are different I had to write the identification problem by hand and solve it. 
+
+To validate that is worked I passed in the controller from the paper and check that is sat out the right parameters. I then passed in the OptimalController calculated by ``VRFT1_dy`` and the parameters don't match ... 
+
+The bode plots of the system are also out of whack ...
+
+Next Steps:
+***********
+
+Go home, study discrete time systems and write a reference model by hand based on the requirements. 
+
+Once I can generate a controller with VRFT I can schedule a meeting with prof. 

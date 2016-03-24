@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Function: VRFT1_ry_ru</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<p align="center"><font size="+3">Function: VRFT1_ry_ru</font></p>
+<hr>
+<p align="center">&nbsp;</p>
+<blockquote>
+<table width="80%" border="0" align="center">
+    <tr> 
+      <td width="20%" valign="top"> <div align="left"> 
+          <p align="center"><font size="+2">C = VRFT1_ry_ru(u,y,Mr,Mu,B,Wr,Wu,lambda,k,optFilt)</font></p>
+          <hr>
+          <p align="justify"> <font size="+1" face="Sylfaen">Design a 1 d.o.f. 
+            linear controller so as to match the r(t) to y(t) closed-loop transfer 
+            function with the model reference Mr and the r(t) to u(t) input sensitivity 
+            with the model reference Mu (see Figure 1).</font></p>
+          <p align="center"><img src="images/1dof.jpg" width="500" height="180"></p>
+          <p align="center"><font face="Sylfaen"><em>Figure 1: 1 degree of freedom 
+            control scheme. </em></font></p>
+          <hr>
+          <div align="center"><font size="+2">Inputs (compulsory)</font> </div>
+          <p align="justify"> <font size="+1" face="Sylfaen">- u: column vector 
+            (Nx1) that contains the INPUT data collected from the plant.</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen"> - y: matrix (Nx2) 
+            that contain the OUTPUT data collected from the plant: y(:,1) contains 
+            the output of the plant when it is fed by u; y(:,2) contains the output 
+            of the plant when it is fed by y(:,1). If y is a Nx4 matrix, the columns 
+            1 and 2 contains the OUTPUT data collected in the first experiment 
+            and the columns 3 and 4 contains the OUTPUT data collected in the 
+            second experiments (the noise realizations in the two experiments 
+            must be uncorrelated).</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- Mr: tf-object that 
+            represents the discrete transfer function of the reference model. 
+            The reference model Mr(z) describes the desired closed loop behaviour 
+            from the reference r(t) to the output y(t).</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- Mu: tf-object that 
+            represents the discrete trasfer function Mu(z) that describes the 
+            desired dynamical relationship from r(t) to u(t) (input sensitivity).</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- B: column vector 
+            of tf-objects. The linear controller has the following structure: 
+            C(z,&theta;)= B'*&theta;, where B is a column vector of transfer functions, 
+            and &theta; is the vector of parameters.</font><br>
+          </p>
+          <hr>
+          <p align="center"><font size="+2">Inputs (optional) </font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- Wr: tf-object of 
+            the weighting function Wr(z). If this parameter is empty [], the function 
+            automatically sets Wr(z) = 1.</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- Wu: tf-object of 
+            the weighting function Wu(z). If this parameter is empty [], the function 
+            automatically sets Wu(z) = 1.</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- lambda: this parameter is used 
+            to balance the emphasis on Mr (lambda close to 0) or on Mu (lambda 
+            close to 1). Note that 0&lt;=lambda&lt;=1. If this parameter is empty 
+            [], the function automatically sets lambda = 0.5.</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- k: this parameter 
+            must be used only if the measured output y is noisy, and a single 
+            experiment is available; in this case this parameter sets the order 
+            of an ARX(k,k) model used to make an approximate model of the plant. 
+            Otherwise this parameter must be empty: [].</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- optFilt: if this 
+            parameter is set to 'n', the optimal filter is disabled, and the filter 
+            L(z) is set to 1. If this parameter is empty ([]) the function uses 
+            the optimal VRFT filter.</font></p>
+          <hr>
+          <p align="center"><font size="+2">Outputs </font></p>
+          <p align="justify"> <font size="+1" face="Sylfaen">- C: tf-object, which 
+            represents the transfer function of the designed controller.</font><br>
+          </p>
+          <p align="justify">&nbsp;</p>
+          <p align="justify">&nbsp;</p>
+        </div></td>
+    </tr>
+  </table>
+  <p align="justify"><br>
+    <br>
+  </p>
+  <p></p>
+</blockquote>
+</body>
+</html>

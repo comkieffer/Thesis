@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block description %}Title: {{ article.title }}; Date: {{ article.date|strftime('%Y-%m-%d') }}; Author: {{ article.author }}{% endblock %}
+{% block title %}{{ article.title }} — {{ SITENAME }}{% endblock %}
+{% block content %}
+<div class="article" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="text-center article-header">
+		<h1 itemprop="name headline" class="article-title">{{ article.title }}</h1>
+		<span itemprop="author" itemscope itemtype="http://schema.org/Person">
+			<h4 itemprop="name">{{article.author or "Anonymous"}}</h4>
+		</span>
+		<time datetime="{{ article.date.isoformat() }}" itemprop="datePublished">{{ article.locale_date }}</time>
+	</div>
+
+	<div itemprop="articleBody" class="article-body">{{ article.content }}</div>
+	<hr>
+</div>
+{% endblock %}

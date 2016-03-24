@@ -1,0 +1,35 @@
+<productinfo
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="optional">
+<?xml-stylesheet type="text/xsl" href="optional"?>
+
+<matlabrelease>14</matlabrelease>
+<name>VRFT</name>
+<type>toolbox</type>
+<icon>$toolbox/matlab/icons/matlabicon.gif</icon>
+<help_location>help/</help_location>
+
+<list>
+
+<listitem>
+<label>VRFT GUI</label>
+<callback>VRFT_GUI</callback>
+<icon>$toolbox/matlab/icons/figureicon.gif</icon>
+</listitem>
+
+<listitem>
+<label>Help</label>
+<callback>doc start_VRFT/</callback>
+<icon>$toolbox/matlab/icons/book_mat.gif</icon>
+</listitem>
+
+<listitem>
+<label>VRFT Web Site</label>
+<callback>web web_site/index.html -browser;</callback>
+<icon>$toolbox/matlab/icons/webicon.gif</icon>
+</listitem>
+
+</list>
+
+</productinfo>
+

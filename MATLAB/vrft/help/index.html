@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>VIRTUAL REFERENCE FEEDBACK TUNING TOOLBOX</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<base target="mainFrame">
+</head>
+
+<body>
+<p align="center"><img src="images/title_VRFT.jpg" width="532" height="45"></p>
+<hr>
+<table width="85%" border="0" align="center">
+  <tr> 
+    <td width="20%" valign="top"> <div align="left">
+        <p align="center"><font size="+3">Welcome to the <em><strong>Virtual Reference 
+          Feedback Tuning </strong></em>Toolbox guide. </font></p>
+        <hr size="1">
+        <p align="center">&nbsp;</p>
+        <blockquote> 
+          <p align="justify"><font size="+1"><strong><font face="Sylfaen">VRFT</font></strong><font face="Sylfaen"> 
+            (&quot;<strong>V</strong>irtual <strong>R</strong>eference <strong>F</strong>eedback 
+            <strong>T</strong>uning&quot;) is a general methodology for the design 
+            of feedback controllers when the plant is unknown. Its main features 
+            are:</font></font></p>
+        </blockquote>
+        <ul>
+          <li><font size="+1" face="Sylfaen">it is a direct method (no model identification 
+            of the plant is needed); </font></li>
+          <li><font size="+1" face="Sylfaen" align="justify">it can be applied 
+            using a single set of data collected from the plant with no need for 
+            specific experiments nor iterations. </font></li>
+        </ul>
+        <font size="+2" face="Sylfaen"></font></div></td>
+  </tr>
+</table>
+<hr>
+<div align="justify"> 
+  <ul type="square">
+    <table width="87%" border="0" align="center">
+      <tr> 
+        <td width="20%" valign="top"> <div align="left"><font size="+2" face="Sylfaen"><strong>What 
+            it is used for: </strong></font></div></td>
+        <td width="80%"><p align="justify"><font size="+1" face="Sylfaen">VRFT 
+            permits to tune a 1 or 2 degree of freedom linear controller within 
+            a specified class on the basis of a single set of input/output data 
+            collected from an experiment on the plant. </font></p></td>
+      </tr>
+      <tr> 
+        <td height="60" valign="top">&nbsp;</td>
+        <td><div align="right"> 
+            <p>&nbsp;</p>
+          </div></td>
+      </tr>
+    </table>
+    <table width="87%" border="0" align="center">
+      <tr> 
+        <td width="20%" valign="top"> <font size="+2" face="Sylfaen"><strong>How 
+          it is used:</strong></font></td>
+        <td width="80%"><p align="justify"><font size="+1" face="Sylfaen">The 
+            control specifications are assigned via a model-reference discrete 
+            time transfer function. Given a single set of input/output data (either 
+            collected in open-loop or in closed-loop), the VRFT method can be 
+            applied in order to obtain the controller that satisfies the assigned 
+            specifications.</font></p></td>
+      </tr>
+      <tr> 
+        <td height="59" valign="top">&nbsp;</td>
+        <td><div align="right"></div></td>
+      </tr>
+    </table>
+    <table width="87%" border="0" align="center">
+      <tr> 
+        <td width="20%" valign="top"> <font size="+3" face="Sylfaen"><strong><font size="+2">How 
+          it works:</font></strong></font></td>
+        <td width="80%"><p align="justify"><font size="+1" face="Sylfaen">The 
+            &quot;design engine&quot; of VRFT is an solver of a model-reference 
+            optimization problem. Lack of knowledge of the plant transfer function 
+            is compensated for via I/O measurements.</font></p></td>
+      </tr>
+      <tr> 
+        <td valign="top">&nbsp;</td>
+        <td><div align="right"> 
+            <p>&nbsp;</p>
+          </div></td>
+      </tr>
+    </table>
+  </ul>
+  <hr>
+  <p align="center"><font size="+3">VRFT Toolbox - Version 1.0 </font></p>
+  <table width="80%" height="1063" border="0" align="center">
+    <tr> 
+      <td width="20%" valign="top"> <div align="left">
+          <div align="justify"> 
+            <hr size="1">
+            <p>&nbsp;</p>
+            <p><font size="+1" face="Sylfaen"><a href="vrft1_ry.html" target=_top>VRFT1_ry</a>: 
+              Design a 1 degree of freedom (1 d.o.f.) linear controller so as 
+              to match the r(t) to y(t) closed-loop transfer function with the 
+              model reference Mr (see Figure 1).</font></p>
+            <p align="center"><img src="images/1dof.jpg" width="500" height="180"></p>
+            <p align="center"><font face="Sylfaen"><em>Figure 1: 1 degree of freedom 
+              control scheme. </em></font></p>
+            <p align="center">&nbsp;</p>
+            <p align="justify"><font size="+1" face="Sylfaen"><a href="vrft1_dy.html" target=_top>VRFT1_dy</a>: 
+              Design a 1 d.o.f. linear controller so as to match the d(t) to y(t) 
+              output sensitivity with the model reference Md (see Figure 1).<br>
+              <br>
+              <a href="vrft1_ry_ru.html" target=_top>VRFT1_ry_ru</a>: Design a 
+              1 d.o.f. linear controller so as to match the r(t) to y(t) closed-loop 
+              transfer function with the model reference Mr and the r(t) to u(t) 
+              input sensitivity with the model reference Mu (see Figure 1).<br>
+              <br>
+              <a href="vrft1_dy_du.html" target=_top>VRFT1_dy_du</a>: Design a 
+              1 d.o.f. linear controller so as to match the d(t) to y(t) closed-loop 
+              transfer function with the model reference Md and the d(t) to u(t) 
+              input sensitivity with the model reference Mu (see Figure 1).<br>
+              <br>
+              <a href="vrft2_ry_dy.html" target=_top>VRFT2_ry_dy</a>: Design a 
+              2 d.o.f. linear controller so as to match the r(t) to y(t) transfer 
+              function and the d(t) to y(t) transfer function (see Figure 2).</font></p>
+            <p align="center"><font size="+1" face="Sylfaen"><br>
+              <br>
+              <img src="images/2dof.jpg" width="500" height="200"> </font></p>
+            <p align="center"><font face="Sylfaen"><em>Figure 2: 2 degree of freedom 
+              control scheme. </em></font></p>
+            <p><font size="+1" face="Sylfaen"><br>
+              <a href="vrft_gui.html" target=_top>VRFT_GUI</a>: starts the Graphical 
+              User Interface for the VRFT toolbox.<br>
+              </font><font size="+1" face="Sylfaen"> </font></p>
+          </div>
+          </div></td>
+    </tr>
+  </table>
+  <hr>
+  <table width="80%" height="503" border="0" align="center">
+    <tr> 
+      <td width="20%" valign="top"> <div align="left"> 
+          <div align="justify">
+            <p align="center"><font size="+1" face="Sylfaen"><font size="+2">Main 
+              references</font></font></p>
+            <hr size="1">
+            <p align="center">&nbsp;</p>
+          </div>
+          <p><font size="+1" face="Sylfaen"><br>
+            - Campi M.C., A. Lecchini, S.M. Savaresi (2002). Virtual Reference 
+            Feedback Tuning: a Direct Method for the Design of Feedback Controllers. 
+            Automatica, Vol.38, n.8, pp.1337-1346.</font></p>
+          <p><font size="+1" face="Sylfaen">- Campi M.C., Lecchini A., Savaresi 
+            S.M. (2003). An application of the Virtual Reference Feedback Tuning 
+            (VRFT) method to a benchmark active suspension system. European Journal 
+            of Control, Vol.9, pp.66-76. </font></p>
+          <p><font size="+1" face="Sylfaen">- Lecchini A., M.C. Campi, S.M. Savaresi 
+            (2002). Virtual reference feedback tuning for two degree of freedom 
+            controllers. International Journal on Adaptive Control and Signal 
+            Processing, vol.16, n.5, pp.355-371. </font></p>
+          <p><font size="+1" face="Sylfaen">- Guardabassi G.O., Savaresi S.M. 
+            (2000). <br>
+            Virtual Reference Direct Design method: an off-line approach to data-based 
+            control system design. IEEE Transactions on Automatic Control , Vol.45, 
+            n.5, pp.954-959. <br>
+            </font></p>
+        </div></td>
+    </tr>
+  </table>
+  <p align="justify"><font size="+1" face="Sylfaen"><br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </font><br>
+  </p>
+  </div>
+</body>
+</html>

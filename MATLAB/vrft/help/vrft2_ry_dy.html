@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Function: VRFT2_ry_dy</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<p align="center"><font size="+3">Function: VRFT2_ry_dy</font></p>
+<hr>
+<p align="center">&nbsp;</p>
+<blockquote> 
+  <table width="80%" border="0" align="center">
+    <tr> 
+      <td width="20%" valign="top"> <div align="left"> 
+          <p align="center"><font size="+2">[Cr,Cy] = VRFT2_ry_dy(u,y,Mr,Md,Br,By,Wr,Wd,fIA,k,optFilt)</font> 
+          </p>
+          <p align="justify"> <font size="+1" face="Sylfaen">Design a 2 d.o.f. 
+            linear controller so as to match the r(t) to y(t) transfer function 
+            and the d(t) to y(t) transfer function (see figure below). (see Figure 
+            1).</font></p>
+          <p align="center"><img src="images/1dof.jpg" width="500" height="200"></p>
+          <p align="center"><font face="Sylfaen"><em>Figure 1: 2 degree of freedom 
+            control scheme. </em></font></p>
+          <hr>
+          <div align="center"><font size="+2">Inputs (compulsory)</font> </div>
+          <p align="justify"> <font size="+1" face="Sylfaen">- u: column vector 
+            (Nx1) that contains the INPUT data collected from the plant.</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- y: column vector 
+            (Nx1) that contains the OUTPUT data collected from the plant. If y 
+            is a Nx2 matrix, the two columns contain the output data collected 
+            in 2 different experiments (both experiments are made with the same 
+            input u(t); the two noise realizations must be uncorrelated).</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- Mr: tf-object that 
+            represents the discrete transfer function of the reference model. 
+            The reference model Mr(z) describes the desired closed loop behaviour 
+            from the reference r(t) to the output y(t).</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- Md: tf-object that 
+            represents the discrete transfer function of the reference model. 
+            The reference model Md(z) describes the desired closed loop behaviour 
+            from the signal d(t) to the output y(t) (output sensitivity).</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- Mu: tf-object that 
+            represents the discrete trasfer function Mu(z) that describes the 
+            desired dynamical relationship from d(t) to u(t) (input sensitivity).</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- Br: column vector 
+            of tf-objects. The linear controller Cr has the following structure: 
+            Cr(z,&theta;r)= Br'*&theta;r, where Br is a column vector of transfer 
+            functions, and &theta;r is the vector of parameters. </font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- By: column vector 
+            of tf-objects. The linear controller Cy has the following structure: 
+            Cy(z,&theta;y)= By'*&theta;y, where By is a column vector of transfer 
+            functions, and &theta;y is the vector of parameters. </font></p>
+          <p align="justify">&nbsp; </p>
+          <hr>
+          <p align="center"><font size="+2">Inputs (optional) </font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- Wr: tf-object of 
+            the weighting function Wr(z). If this parameter is empty [], the function 
+            automatically sets Wr(z) = 1.</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- Wd: tf-object of 
+            the weighting function Wd(z). If this parameter is empty [], the function 
+            automatically sets Wd(z) = 1.</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- fIA: this parameter must be use 
+            only if an integral action is inclused in both control structures 
+            Br and By. Otherwise this parameter must be empty: []. If: fIA = 'y' 
+            the constraint on the fixed integral action is enabled in order to 
+            have null tracking error (Mr(1) = 1) and perfect disturbance rejection 
+            (Md(1) = 0); fIA = 'n' the constraint on the fixed integral action 
+            is disabled (Mr(1) = Cr(1)/Cy(1)).</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- k: this parameter 
+            must be used only if the measured output y is noisy, and a single 
+            experiment is available; in this case this parameter sets the order 
+            of an ARX(k,k) model used to make an approximate model of the plant. 
+            Otherwise this parameter must be empty: [].</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- optFilt: if this 
+            parameter is set to 'n', the optimal filter is disabled, and the filter 
+            Lr(z) and Ly(z) are set to 1. If this parameter is empty ([]) the 
+            function uses the optimal VRFT filter.</font></p>
+          <p align="justify">&nbsp;</p>
+          <hr>
+          <p align="center"><font size="+2">Outputs </font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- Cr: tf-object, which 
+            represents the transfer function of the designed controller Cr(z,&theta;r).</font></p>
+          <p align="justify"><font size="+1" face="Sylfaen">- Cy: tf-object, which 
+            represents the transfer function of the designed controller Cy(z,&theta;y).</font><br>
+          </p>
+          <p align="justify">&nbsp;</p>
+          <p align="justify">&nbsp;</p>
+        </div></td>
+    </tr>
+  </table>
+</blockquote>
+</body>
+</html>
