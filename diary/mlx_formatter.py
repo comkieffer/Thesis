@@ -1,8 +1,13 @@
+#!/usr/bin/python3
 
-import sys, os
+import sys, os, re, copy
 from optparse import OptionParser
-from bs4 import BeautifulSoup 
+from bs4 import BeautifulSoup, Comment
 from jinja2 import Environment, PackageLoader
+
+
+# TODO: figure out why &nbsp becomes A&nbsp
+# Replace equations
 
 def convert(in_file, out_file):
 
@@ -16,27 +21,153 @@ def convert(in_file, out_file):
 
     soup = BeautifulSoup(html_source, 'html.parser')
     style = soup.head.style
+    
+    # FIXME !
+    print('Replacing equation images with latex ')
+    convert_equations(soup)
+
+    # Process sections to extract their outputs and put them in a second pane
     sections = soup.find_all('div', 'SectionBlock')
-    print('Found {} sections'.format(len(sections)))
+    print('\nLocated {} sections in the input.\n'.format(len(sections)))
+    split_sections = [process_section(s) for s in sections]
 
-
-    output_blocks = []
-    for section in sections: 
-        # Locate the outputs clock if it exists and move out of the tree
-        outputs = section.find('div', 'inlineWrapper outputs')
-        output_blocks.append({'input': section, 'output': outputs.extract() if outputs else ''})
-
-
-        # For some reason the last line of the code preceding the outputs block is included in the
-        # outputs. We need to grab it and move it back to the right place. 
-        if outputs:
-            last_code_line = outputs.find('p', 'S2 lineNode')
-            if last_code_line: 
-                inlineWrapper = soup.new_tag('div', **{'class': 'inlineWrapper'})
-                inlineWrapper.append(last_code_line.extract())
+    title = 'Matlab Live Script'
+    if len(sections) >= 1: 
+        title = extract_section_title(sections[0])
 
     with open(out_file, 'w') as file:
-        file.write(template.render(matlab_styles=style, sections=output_blocks))
+        file.write(template.render(
+            title = title, matlab_styles=style, sections=split_sections))
+
+
+def convert_equations(soup):
+    # Extact text contained between ##### SOURCE BEGIN ##### and ##### SOURCE END ##### 
+    # dicard all non-comment lines.
+    comments =  soup.findAll(text=lambda text:isinstance(text, Comment))
+
+    ml_source = None
+    for comment in comments: 
+        comment_text = str(comment).strip()
+        if comment_text.startswith('##### SOURCE BEGIN #####'):
+            ml_source = comment_text
+
+    if not ml_source: 
+        print('\nWARNING: Unable to locate the original MATLAB source in the file. Equations will not be substituted\n')
+        return
+
+    # Equations will only be contained in comment lines. To extract them we discard all non-comment 
+    # lines and trim whitespace. 
+    code_lines = [l.strip() for l in ml_source.split('\n')]
+    comment_lines = [l for l in code_lines if len(l) > 0 and l[0] == '%']
+
+    # extract equations with regexp
+    # The rege looks for blocks of 1 or more $ characters followed by any other character one or 
+    # more times non-greedily until it finds one or more $ characters. 
+    #
+    # This is not a robust regex !! It can beak in so many different ways. I'll  try to fix them as 
+    # I come across them.
+    equation_re = re.compile(r'(\$+.+?\$+)', re.DOTALL)
+    equations = equation_re.findall('\n'.join(comment_lines))
+
+    # extract eqution divs. These do not have a distinctive class. The best way of finding them 
+    # seems to be extracting all the image tags and discarding the ones that have a .figureImage 
+    # class
+    def images_that_are_not_figures(tag):
+        if tag.name == 'img' and not tag.has_attr('class'):
+            return True
+        else:
+            return False
+
+    equation_image_divs = soup.find_all(images_that_are_not_figures)
+
+    if len(equations) != len(equation_image_divs):
+        print('\nWARNING: I found a different number of equations in the embedded source code and in the html. Since I can\'t match them to one another I won\'t be replacing the equtions in the ouput.\n')
+
+        print('Equations extracted: ')
+        for eq in equations:
+            print('  => ', eq)
+
+        print('\nImages Extracted')
+
+    # We have the same number of equations and images ! We can replace them all !
+    print('  Isolated {} equations in the embedded source and {} equation images'.format(
+        len(equations), len(equation_image_divs)))
+
+    for i in range(len(equations)): 
+        # We need to detect whether this is an inline equation or not. maybe detect the presence of siblings ?
+
+        new_eq = soup.new_tag('span', class_='math')
+        new_eq.string = equations[i]
+        
+        equation_image_divs[i].replace_with(new_eq)
+
+
+def process_section(section):
+    """
+    Sections contain text, code, equations, textual outputs and figures. We want to keep the text, 
+    code and equations in the left pane and the textual output ad figure in the right pane. 
+    """
+
+    print('Section: {}'.format(extract_section_title(section)))
+
+    output_paragraphs = section.find_all('div', 'outputParagraph')
+    print('  Found {} output blocks'.format(len(output_paragraphs)))
+
+    outputs = []
+    for output in output_paragraphs:
+        outputs.append(output.extract())
+
+    # For some reason the last of line of code before a figure sometimes has an extra .output class
+    # we need to remove it. 
+    code_with_output_class = section.select('.inlineWrapper.outputs')
+    print('  Found {} code lines with the .output class'.format(len(code_with_output_class)))
+
+    for line in code_with_output_class:
+        line.attrs['class'] = 'inlineWrapper'
+   
+    # To improve readability we also remve empty lines from the start and end of each code block
+    for code_block in section.select('.LineNodeBlock'):
+        trim_empty_code_lines(code_block)
+
+    return (section, outputs)
+
+
+def extract_section_title(section):
+    # If the section has a title defined then the job is easy
+    title = section.h2
+
+    # If the section does not have a title then we need to get creative. We simply use the text of 
+    # the first, non code section, or if the node contains only code the first line
+    if not title:
+        text_only = copy.copy(section)
+        
+        # Remove code nodes
+        code_nodes = text_only.select('.LineNodeBlock')
+        for node in code_nodes:
+            node.extract()
+
+        if len(text_only.contents):
+            title = text_only.contents[0]
+        else:
+            title = section
+
+    return title.get_text()[:70] 
+
+
+def trim_empty_code_lines(section):
+    lines = section.find_all('div', 'inlineWrapper')
+
+    for line in lines:
+        if line.get_text() == '': 
+            line.extract()
+        else:
+            break
+
+    for line in lines[::-1]:
+        if line.get_text() == '':
+            line.extract()
+        else:
+            break
 
 
 if __name__ == '__main__':
@@ -60,6 +191,5 @@ if __name__ == '__main__':
         filename, ext = os.path.splitext(file)
         options.out_file = os.path.join(dirname, filename + '_mlx' + ext)
 
-    print('Saving generated file to ', options.out_file)
-
     convert(options.in_file, options.out_file)
+    print('\nSaved generated file to ', options.out_file)

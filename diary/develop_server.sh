@@ -3,12 +3,12 @@
 # This section should match your Makefile
 ##
 
-PY=${PY:-python}
+PY=${PY:-python3}
 PELICAN=${PELICAN:-pelican}
 PELICANOPTS=
 
 BASEDIR=$(pwd)
-INPUTDIR=$BASEDIR/../content
+INPUTDIR=$BASEDIR/content
 OUTPUTDIR=$BASEDIR/output
 CONFFILE=$BASEDIR/pelicanconf.py
 

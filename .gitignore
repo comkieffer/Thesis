@@ -4,10 +4,21 @@
 *.pyc
 
 # Ignore the pelican output directory
-diary/
+# We can also ignore *_mlx.html files generated from the matlab published files
+# since they can be trivially re-generated with the mlx_formatter.py command.
+diary/output
+*_mlx.html
 
 # Ignore the default MATLAB html output directory
 MATLAB/html/*
 
 # Ignore sublime text workspace files 
 *.sublime-workspace
+
+# Temporarily ignore ICT project, Other resources folder
+MATLAB/Progetto ICT VRFT/*
+Other Resources/*
+
+# Ignore the pelican dev-server pid file
+srv.pid
+pelican.pid

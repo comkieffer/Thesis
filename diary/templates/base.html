@@ -2,6 +2,9 @@
 <html lang="en">
 
     <head> 
+        <title>{{ title }}</title>
+        
+        <!-- MATLAB Styles, real semantic and all. Good job guys ! -->
         {{ matlab_styles }}
 
         <!-- Our Styles -->
@@ -36,13 +39,25 @@
 
             .LineNodeBlock.contiguous { overflow: auto;  }
         </style>
+
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+              tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+            });
+        </script>
+
+        <script type='text/javascript' src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
     </head> 
     <body> 
     <div class="content_wrapper">
     {% for section in sections %}
         <div class="content_row clearfix">
-            <div class="pane">{{ section['input'] }}</div>
-            <div class="pane">{{ section['output'] }}</div>
+            <div class="pane">{{ section[0] }}</div>
+            <div class="pane">  
+                {% for output in section[1] %} 
+                    {{ output }}
+                {% endfor %}
+            </div>         
         </div>
     {% endfor %}
     </div>

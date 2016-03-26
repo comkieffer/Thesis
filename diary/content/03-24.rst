@@ -1,0 +1,105 @@
+
+Finding out if our controller sucks
+===================================
+
+:date: 2016-03-24
+
+This morning I spent some time fixing up various MATLAB scripts. My startup script produces cleaner output making it easier to identify packages that have been loaded. 
+
+Discovering some weird things
+*****************************
+
+Problem 1 : Loop transfer function
+----------------------------------
+
+My gentle predecessors seem to have made a mistake. They have a reference model (``ref_model``) loaded from a data file. They then calculat the loop transfer function of this model.
+
+.. code-block:: matlab
+
+    discreto=c2d(ref_model,Ts,'tustin'); 
+    L_rif=discreto/(1-discreto); 
+
+How does this make sense. The reference model is an **open loop**, **feed forward** type model from the reference input to the output. It should be compared directly with the **closed loop** plant model. 
+
+Problem 2: Sample Time
+----------------------
+
+They have a sample time of 0.02s. Is that correct ?
+
+Comparing the 2 models:
+***********************
+
+.. figure:: {filename}static/03-24/mine_vs_theirs_step.png
+    :align: center
+
+    Comparison of the step responses of the 2 reference models
+
++---------------+----------+----------+
+| Models        | Mine     | Theirs   |
++===============+==========+==========+
+| Rise TIme     | 0.1172 s | 0.4453 s |
++---------------+----------+----------+
+| Overshoot     | 25.37 %  | 9.48 %   |
++---------------+----------+----------+
+| Peak          | 1.2537   | 1.0948   |
++---------------+----------+----------+
+| Peak Time     | 0.2763   | 0.9394   |
++---------------+----------+----------+
+| Settling Time | 0.6728 s | 1.4264 s |
++---------------+----------+----------+
+
+Our model is faster but has higher overshoot. In hindsight I should probably bring the overshoot down some more but it's fine for the moment.
+
+The bode plots are also OK. 
+
+.. figure:: {filename}static/03-24/mine_vs_theirs_bode.png
+    :align: center
+
+    Comparison of the Bode plots of the 2 reference models
+
+You can view the mlx file for the comparison `here <{filename}/static/03-24/mine_vs_theirs_mlx.html>`_. 
+
+
+What else did I do ?
+********************
+
+I worked with one of the papers ("Virtual Reference Feedback Tuning (VRFT): a new direct approach to the design of feedback controllers") and implemented their controller to check that what I was doing worked. 
+
+I have one issue that is shown in the last part of the paper. For  high values of :math:`t` the closed loop system diverges. I can't see anything in the system that might explain this behaviour so I don't know what's going on. 
+
+This work is implemented in `this <{filename}/static/03-24/vrft_paper_example_mlx.html>`_ mlx file.
+
+
+I also spent some time brushing up on my understanding of the VRFT method and started writing the static page describing the VRFT method. The rest of my time was spent writing a (still unfinished) script to convert MATLAB ``tf`` objects to latex code and fixing up my startup file. 
+
+Next Steps
+**********
+
+* Try the vrft script I've made on the other example from the paper. I recall the coeficients being off. 
+* I need to have a better grasp of the maths behind the VRFT method. I remember detailing them in the black notebook
+* I need to work on cascade VRFT some more to understand it. How do I make the reference signal ? 
+
+
+
+
+Moving on, the cascade algorithm
+********************************
+
+1. Develop 2 reference models, :math:`M_i(q)` for the inner loop and :math:`M_o(q)` for the outer loop 
+2. Develop two families of proper controllers :math:`{C_i(q; \theta_i)}` and :math:`{C_o(q; \theta_o)}`
+   
+The available data is: 
+
+* :math:`u(t)` the control variable
+* :math:`y_i(t)` the output of the inner loop
+* :math:`y_o(t)` the output of the outer loop
+  
+The inner controller can be easily tuned with standard vrft. The outer controller is more problematic. The inner controller can be tuned because its output is the control variable :math:`u(t)`, the output of the outer controller is :math:`r_i(t)` which unfortunately is not available to us. However, we can compute a reference signal :math:`r_{iV}(t)` such that :math:`y_i(t) = M_i(q)r_{iV}(t)`. If the inner controller is correctly parametrized (:math:`C_i(q; \theta_i)` cancels :math:`J_{MR}(\theta`) then :math:`r_i(t) = r_{iV}(t)`. 
+
+In this case we can apply a new VRFT to the outer controller. I'm not sure what to do if this isn't the case. 
+
+Open questions so far
+---------------------
+1. How can I evaluate whether the controller is in the right class. Can I always assume that this is what the VRFT tool gives me? 
+
+

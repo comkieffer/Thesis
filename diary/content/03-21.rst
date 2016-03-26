@@ -49,6 +49,6 @@ At this point we can apply the VRFT algorithm:
 
     OptimalController_dt = VRFT1_ry(io_data.u1, io_data.y1, RefModel_dt, ControllerFamily_dt, [], [], []);
 
-Click  `here <{filename}/static/03-21/work_mlx.html>`_ to view the ``.mlx`` file for the day.
+Click  `here <{filename}/static/03-21/matlab_work_mlx.html>`_ to view the ``.mlx`` file for the day.
 
 Tomorrow I'll compare my controller with the controller from the previous guys and see what they have. Hopefullly it should be pretty similar. 
