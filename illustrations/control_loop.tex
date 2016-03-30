@@ -1,0 +1,69 @@
+\documentclass{article}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\begin{document}
+
+
+\tikzstyle{block} = [draw, fill=blue!20, rectangle, minimum height=3em, minimum width=6em]
+\tikzstyle{sum} = [draw, fill=blue!20, circle, node distance=2cm]
+\tikzstyle{input} = [coordinate]
+\tikzstyle{output} = [coordinate]
+\tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
+
+% The block diagram code is probably more verbose than necessary
+\begin{tikzpicture}[auto, node distance=2cm,>=latex']
+    % We start by placing the blocks
+    \node [input, name=input] {};
+    \node [sum, right of=input] (sum) {};
+    \node [block, right of=sum] (controller) {Controller};
+    \node [block, right of=controller, node distance=4cm] (system) {System};
+    
+    % We draw an edge between the controller and system block to 
+    % calculate the coordinate u. We need it to place the measurement block. 
+    \draw [->] (controller) -- node[name=u] {$u$} (system);
+    \node [output, right of=system] (output) {};
+    \node [block, below of=u] (measurements) {Measurements};
+
+    % Once the nodes are placed, connecting them is easy. 
+    \draw [draw,->] (input) -- node {$r$} (sum);
+    \draw [->] (sum) -- node {$e$} (controller);
+    \draw [->] (system) -- node [name=y] {$y$}(output);
+    \draw [->] (y) |- (measurements);
+    \draw [->] (measurements) -| node[pos=0.99] {$-$} 
+        node [near end] {$y_m$} (sum);
+\end{tikzpicture}
+
+	\begin{tikzpicture}[scale=1, auto, node distance = 2cm]
+	
+	% Place main control loop nodes
+	\draw
+		node[input ,                        name = input ]              {}
+		node[sum   , right of = input                    ] (sum)        {}
+		node[block , right of = sum                      ] (controller) {$C(z; \theta)$}
+		node[block , right of = controller               ] (plant)      {$P(z)$}
+		node[output, right of = plant     , name = output]              {};
+	\coordinate[shift={(0,-1)}] (n) at (plant.south);
+	
+	% Place reference model
+	\draw
+		node[block, above of = controller] (refmodel) {$M_R(z)$};
+	
+	% Connect blocks in the main control loop
+	\draw[->, >=stealth] (input)      -- (sum); 
+	\draw[->, >=stealth] (sum)        -- (controller) node[midway] {$e(t)$}; 
+	\draw[->, >=stealth] (controller) -- (plant)      node[midway] {$u(t)$}; 
+	\draw[->, >=stealth] (plant)      -- (output)     node         {$y(t)$};
+	\draw[->, >=stealth] (output)       |- (n) -| (sum);
+	
+	%\draw[->, >=stealth] (-3, 0) |- (refmodel);
+	%\draw[->, >=stealth] (refmodel) -- (6, 2) node[right] {$y(t)$};
+	
+	
+	%\draw (-4, 0) node[left] {$r_i(t)$};
+	%\draw (6, 0)  node[right] {$y(t)$};
+	%\draw (sum) node[below left] {$-$};
+	%\draw (sum) node[above left] {$+$};
+	\end{tikzpicture}
+
+\end{document}

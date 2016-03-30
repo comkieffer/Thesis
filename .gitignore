@@ -22,3 +22,8 @@ Other Resources/*
 # Ignore the pelican dev-server pid file
 srv.pid
 pelican.pid
+
+# Ignore latex junk files
+*.aux
+*.log   
+*.synctex.gz

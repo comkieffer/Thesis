@@ -4,7 +4,8 @@ from __future__ import unicode_literals
 
 AUTHOR = u'Tibo'
 SITENAME = u'Thesis Log'
-SITEURL = ''
+SITEURL=''
+SITESUBTITLE='Keeping myself in check'
 
 THEME='aboutwilson'
 

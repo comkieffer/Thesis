@@ -21,9 +21,17 @@
 </head>
 <body>
 <div class="container">
-	<div class="page-header">
+	<div class="page-header clearfix">
 		<h1><a href="{{ SITEURL }}/">{{ SITENAME }}</a>
 			<br>{% if SITESUBTITLE %}<small>{{ SITESUBTITLE }}</small></h1>{% endif %}
+
+		<div class="pull-right">
+		{% for page in PAGES %}
+			<span class="h5">
+				<a href="{{ SITEURL }}/{{ page.url }}">{{ page.title }}</a>
+			</span>
+		{% endfor %}
+		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
