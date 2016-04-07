@@ -7,10 +7,10 @@ Remembering what's up
 
 Today I started working on my thesis again. I was hoping to make swift progress but as usual the minutiae will bog you down. 
 
-I tried to replicate the examples from the papers. Both papers (A new approach, A direct method) use the same numerical example but present it differently and change one parameter (:math:`\bar{\omega}`). It also doesn’t look like they are using the toolbox. 
-It didn’t work. 
+I tried to replicate the examples from the papers. Both papers (A new approach, A direct method) use the same numerical example but present it differently and change one parameter (:math:`\bar{\omega}`). It also doesn't look like they are using the toolbox. 
+It didn't work. 
 
-The Bode plot of the reference model and the plant model are correct but the generated controller isn’t. The controller family is: 
+The Bode plot of the reference model and the plant model are correct but the generated controller isn't. The controller family is: 
 
 
 .. math::
@@ -43,15 +43,15 @@ The optimal controller is :
 .. math::
 	C(z) = \beta^T(z) \cdot {\theta_n}^T
 
-Thus we need to split the controller into independant terms: 
+Thus we need to split the controller into independent terms: 
 
 .. math::
 	C(z; \theta) = \frac{A_1}{1 - z^{-1}} + \frac{A_2}{1 - z^{-1}} + ... + \frac{A_6}{1 - z^{-1}}
 
-I also started to look at the previous work to make a work plan. My predecessors made a :math`2^{nd}` order continuous time reference model that they then translated to discrete time with c2d. I'd like to start y making a discrete time model and skip the continous time model entirely. 
+I also started to look at the previous work to make a work plan. My predecessors made a :math`2^{nd}` order continuous time reference model that they then translated to discrete time with ``c2d``. I'd like to start y making a discrete time model and skip the continuous time model entirely. 
 
 The controller is a simple PID. I need to brush up on the theory side of things to understand discrete time stuff better. 
 
 Once I have the PID family set up I can generate the optimal controller and start thinking about the cascade problem. 
 
-The objective is to have a proof of concept of the cascade setup ASAP to show to the professor. I'll worry about noise later on. 
+The objective is to have a proof of concept of the cascade set-up ASAP to show to the professor. I'll worry about noise later on. 

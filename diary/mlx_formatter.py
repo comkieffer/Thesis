@@ -23,12 +23,12 @@ def convert(in_file, out_file):
     style = soup.head.style
     
     # FIXME !
-    print('Replacing equation images with latex ')
+    # print('Replacing equation images with latex ')
     convert_equations(soup)
 
     # Process sections to extract their outputs and put them in a second pane
     sections = soup.find_all('div', 'SectionBlock')
-    print('\nLocated {} sections in the input.\n'.format(len(sections)))
+    # print('\nLocated {} sections in the input.\n'.format(len(sections)))
     split_sections = [process_section(s) for s in sections]
 
     title = 'Matlab Live Script'
@@ -87,11 +87,11 @@ def convert_equations(soup):
         for eq in equations:
             print('  => ', eq)
 
-        print('\nImages Extracted')
+        # print('\nImages Extracted')
 
     # We have the same number of equations and images ! We can replace them all !
-    print('  Isolated {} equations in the embedded source and {} equation images'.format(
-        len(equations), len(equation_image_divs)))
+    # print('  Isolated {} equations in the embedded source and {} equation images'.format(
+    #    len(equations), len(equation_image_divs)))
 
     for i in range(len(equations)): 
         # We need to detect whether this is an inline equation or not. maybe detect the presence of siblings ?
@@ -108,10 +108,10 @@ def process_section(section):
     code and equations in the left pane and the textual output ad figure in the right pane. 
     """
 
-    print('Section: {}'.format(extract_section_title(section)))
+    # print('Section: {}'.format(extract_section_title(section)))
 
     output_paragraphs = section.find_all('div', 'outputParagraph')
-    print('  Found {} output blocks'.format(len(output_paragraphs)))
+    # print('  Found {} output blocks'.format(len(output_paragraphs)))
 
     outputs = []
     for output in output_paragraphs:
@@ -120,7 +120,7 @@ def process_section(section):
     # For some reason the last of line of code before a figure sometimes has an extra .output class
     # we need to remove it. 
     code_with_output_class = section.select('.inlineWrapper.outputs')
-    print('  Found {} code lines with the .output class'.format(len(code_with_output_class)))
+    # print('  Found {} code lines with the .output class'.format(len(code_with_output_class)))
 
     for line in code_with_output_class:
         line.attrs['class'] = 'inlineWrapper'
@@ -129,6 +129,9 @@ def process_section(section):
     for code_block in section.select('.LineNodeBlock'):
         trim_empty_code_lines(code_block)
 
+    # By default Beautiful soup will convert all html entities to equivalent unicode characters. To 
+    # retrieve the original entities (especially &nbsp) we need to reencode the data.
+    outputs = [o.encode_contents(formatter='html') for o in outputs]
     return (section, outputs)
 
 
@@ -192,4 +195,4 @@ if __name__ == '__main__':
         options.out_file = os.path.join(dirname, filename + '_mlx' + ext)
 
     convert(options.in_file, options.out_file)
-    print('\nSaved generated file to ', options.out_file)
+    print('mlx_formatter: saved generated file to ', options.out_file)

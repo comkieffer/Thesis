@@ -11,11 +11,15 @@ To use VRFT we need:
 * a reference model, a model that describes the ideal behaviour of the closed loop system.
 * one set of input-output data on the plant. The input does not need to have any special characteristics. 
 
-.. figure:: {filename}/static/about-vrft/vrft_block_diagram.png
+.. figure:: {filename}/static/pages/about-vrft/vrft_block_diagram.png
     :align: center  
     :alt: The block diagram of VRFT
 
-Since the output $y(t)$ is known we can calculate an input signal :math:`r(t)` such that: 
+    Block diagram showing the closed loop control system and the reference model.
+
+    Note that the output of the reference model and the control loop are identical.
+
+Since the output :math:`y(t)` is known we can calculate an input signal :math:`r(t)` such that: 
 
 .. math::
     
@@ -107,7 +111,7 @@ Since this equation is quadratic in :math:`\theta` the optimal value :math:`\hat
 
     \hat{\theta}_N = \left[ \sum_t \phi(t) \phi(t)^T \right]^{-1} \sum_t \phi(t)u(t)
 
-However, we still haven't solved the original problem of minimising :math:`J_{MR}`. This method though is useful beacuse it is based purely on the data and is relatively easy to compute. 
+However, we still haven't solved the original problem of minimising :math:`J_{MR}`. This method though is useful because it is based purely on the data and is relatively easy to compute. 
 
 Before continuing we need to make a digression. Let's rewrite :math:`J_{MR}` in the frequency domain
 
@@ -175,24 +179,27 @@ Which brings us to:
 .. math::
 
     \begin{aligned}
-        1 - C(\theta) \cdot \frac{1 - M_R}{M_R} \cdot P &= \frac{1}{M_R} \left( M_R - PC(\theta)(1 - M_R) \right) \\
+        1 - C(\theta) \cdot \frac{1 - M_R}{M_R} \cdot P &= \frac{1}{M_R} \left( M_R - PC(\theta) \left[ 1 - M_R \right] \right) \\
             &= \frac{1}{M_R} \left( \frac{PC_0}{1 + PC_0} - \frac{PC(\theta)}{1 + PC_0} \right) \\
             &= \frac{1}{M_R} \left( P \cdot \frac{C_0 - C(\theta)}{1 + PC_0} \right) \\
+            &= \frac{1}{M_R} P \cdot \left( C_0 - C(\theta) \right) \left( 1 - M_R \right)
     \end{aligned}
 
-By subsituting this result back into :math:`J^N_{VR}` we obtain: 
+By subsituting this result back into :math:`J_{VR}` we obtain: 
 
 .. math::
 
-    J^N_{VR}(\theta) = E \left[ \left( \frac{L}{M_R} \cdot \left( C_0 - C(\theta) \cdot \left( 1 + PC_0 \right) \right) \right)^2 \right]
+    J^N_{VR}(\theta) = E \left[ \left( \frac{L}{M_R} \cdot \left( C_0 - C(\theta) \right) \cdot \left( 1 - M_R \right) \right)^2 \right]
 
 The frequency-domain representation of this criterion is:
 
 .. math::
 
-    J_{VR}(\theta) = \frac{1}{2\pi} \int_{-\pi}^{\pi} \left| P \cdot \frac{C_0 - C(\theta)}{1 + PC_0} \cdot \frac{L}{M_R} \right|^2 \Phi_u d\omega
+    J_{VR}(\theta) = \frac{1}{2\pi} \int_{-\pi}^{\pi} \left| P \cdot \left( C_0 - C(\theta) \right) \left( 1 - M_R \right) \cdot \frac{L}{M_R} \right|^2 \Phi_u \ d\omega
 
-Where, :math:`\Phi_u` is the power density of :math:`u(t)`. If :math:`C_0(z) \in C(z; \theta)` and :math:`J_{VR}(\theta)` has a unique minimum then minimizing :math:`J_VR{\theta}` will always yield :math:`{C_0(z)}` independantly of the value of :math:`L(z)`.
+Where, :math:`\Phi_u` is the power density of :math:`u(t)`. 
+
+If :math:`C_0(z) \in C(z; \theta)` and :math:`J_{VR}(\theta)` has a unique minimum then minimizing :math:`J_{VR}(\theta)` will always yield :math:`{C_0(z)}` independently of the value of :math:`L(z)`.
 
 Notice the similarity between the expressions of :math:`J_{MR}` and :math:`J_{VR}`. With a proper choice of the pre-filter :math:`L(z)` we can make them equal. 
 
@@ -207,8 +214,8 @@ Then,
 .. math:: 
     
     \begin{aligned}
-        J_{VR}(\theta) &= \frac{1}{2\pi} \int_{-\pi}^{\pi} \left| P \cdot \frac{C_0 - C(\theta)}{1 + PC_0} \cdot \frac{W}{1 + PC(\theta)} \right|^2 d\omega \\
-                       &= \frac{1}{2 \pi} \cdot \int_{-\pi}^{\pi} \left| P \cdot \frac{C(\theta) - C_0}{[1 + PC(\theta)][1 + PC_0]} \right|^2 \left| W \right|^2 d\omega = J_{MR}(\theta)
+        J_{VR}(\theta) &= \frac{1}{2\pi} \int_{-\pi}^{\pi} \left| P \cdot \frac{C_0 - C(\theta)}{1 + PC_0} \cdot \frac{W}{1 + PC(\theta)} \right|^2 \ d\omega \\
+                       &= \frac{1}{2 \pi} \int_{-\pi}^{\pi} \left| P \cdot \frac{C(\theta) - C_0}{[1 + PC(\theta)][1 + PC_0]} \right|^2 \left| W \right|^2 \ d\omega = J_{MR}(\theta)
     \end{aligned}
 
 Unfortunately this pre-filter is not practical since it depends on knowing the plant model :math:`P`. However, if :math:`C(z; \theta)` is a good approximation of :math:`C_0(z)` then:

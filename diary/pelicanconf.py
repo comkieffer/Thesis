@@ -10,7 +10,11 @@ SITESUBTITLE='Keeping myself in check'
 THEME='aboutwilson'
 
 PLUGIN_PATHS = ['./plugins']
-PLUGINS = ['render_math']
+PLUGINS = ['render_math', 'better_figures_and_images']
+
+# Better Figures And Images
+RESPONSIVE_IMAGES = True
+FIGURE_NUMBER = True
 
 SUMMARY_MAX_LENGTH = 100
 

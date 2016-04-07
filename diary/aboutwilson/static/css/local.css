@@ -104,3 +104,20 @@ div.collapseheader {
 }
 
 .MathJax_Display { font-size: 0.9em !important; }
+
+.page-header .h5 { margin-right: 1em;  }
+
+.caption, .legend {
+    width: 90%;
+    margin-left: 5%;
+    
+    font-family: Palatino; 
+}
+
+.legend { font-size: 0.9em; color: #636365; }
+
+.figure { 
+    padding: 1em 2em;
+    margin-bottom: 10px; 
+}
+.figure > img { margin-bottom: 10px; }

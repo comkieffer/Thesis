@@ -11,6 +11,7 @@ diary/output
 
 # Ignore the default MATLAB html output directory
 MATLAB/html/*
+MATLAB/*.html
 
 # Ignore sublime text workspace files 
 *.sublime-workspace
@@ -24,6 +25,7 @@ srv.pid
 pelican.pid
 
 # Ignore latex junk files
-*.aux
-*.log   
-*.synctex.gz
+illustrations/*.pdf
+illustrations/*.aux
+illustrations/*.log   
+illustrations/*.synctex.gz

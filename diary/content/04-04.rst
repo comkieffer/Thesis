@@ -1,0 +1,7 @@
+
+I'm a VRFT Expert !!
+--------------------
+
+:date: 2016-04-04
+
+Today I figured out how to export my tikz figures as images, finished the tf2latex script. I'm honestly not sure what I'll use it for but it's pretty cool. The real meat of today's work was finishing the write-up on VRFT. I now have a complete explanation of the method `here <{filename}/pages/about-vrft.rst>`_.
