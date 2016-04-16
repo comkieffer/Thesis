@@ -1,0 +1,98 @@
+
+Modelling is like plumbing
+==========================
+
+:date: 2016-04-16
+
+After a small hiatus I'm back to work. THe aim today is to finish connecting the models together so that I can make the reference models. If all goes well I might even be able to run the VRFT. 
+
+So far I've redone all the calculations manually and I think I've figured how to plug the equations together.
+
+The complete attitude model of the quad-copter is: 
+
+.. math::
+
+    I_n \dot{\omega}_b + \omega_b \times \left( I_n \omega_b \right) = M_{Damp} + M_{props}
+
+.. math::
+
+    M_{Damp} = \begin{bmatrix} 
+        \frac{\partial L}{\partial p} 0 0 \\
+        0 \frac{\partial M}{\partial q} 0 \\
+        0 0 \frac{\partial N}{\partial r}
+    \end{bmatrix} \cdot \begin{bmatrix}
+        p \\ q \\ r
+    \end{bmatrix} \quad , \quad M_{Prop} = \begin{bmatrix} 
+        K_T \frac{b}{\sqrt{2}} \left( \Omega_1^2  - \Omega_2^2 - \Omega_3^2 + \Omega_4^2 \right) \\
+        K_T \frac{b}{\sqrt{2}} \left( \Omega_1^2  + \Omega_2^2 - \Omega_3^2 - \Omega_4^2 \right) \\
+        K_Q \left( -\Omega_1^2 + \Omega_2^2 - \Omega_3^2 + \Omega_4^2 \right)
+    \end{bmatrix}
+
+Since we are only considering the pitch dynamics of the quad-copter the model reduces to: 
+
+.. math::
+
+    I_{yy}\dot{q} + \left(I_{xx} - I_{zz} \right) pr= \frac{\partial M}{\partial q} q +  K_T \frac{b}{\sqrt{2}} \left( \Omega_1^2  + \Omega_2^2 - \Omega_3^2 - \Omega_4^2 \right)
+
+We constrain the speed of the two front and the two rear rotors to be the same
+
+.. math::
+
+    \begin{aligned}
+        \Omega_1 &= \Omega_2 = \Omega_F \\ 
+        \Omega_3 &= \Omega_4 = \Omega_R,\ 
+    \end{aligned}
+
+This assumption reduces the model even further: 
+
+.. math:: 
+
+    \begin{aligned}
+        I_{yy}\dot{q} + \left(I_{xx} - I_{zz} \right) pr
+            &= \frac{\partial M}{\partial q} q + K_T \frac{b}{\sqrt{2}} \left( \Omega_F^2  + \Omega_F^2 - \Omega_R^2 - \Omega_R^2 \right) \\
+            &= \frac{\partial M}{\partial q} q +  K_T b \sqrt{2} \left( \Omega_F^2 - \Omega_R^2 \right)
+    \end{aligned}
+
+We now linearize the model around hover conditions. The speed of the propellers in a perfect hover is :math:`\Omega_H`. 
+
+.. math::
+    \begin{alignedat}{4}
+        \delta \Omega_F &&= \Omega_F - \Omega_H \quad &&\Rightarrow&& \quad \Omega_F &&= \delta \Omega_F + \Omega_H\\
+        \delta \Omega_R &&= \Omega_R - \Omega_H \quad &&\Rightarrow&& \quad \Omega_R &&= \delta \Omega_R + \Omega_H\\
+    \end{alignedat}
+
+The control input :math:`u` is the variation in the speed of the propellers: 
+
+.. math:: 
+
+    u = \delta \Omega = \delta \Omega_F = -\delta \Omega_R
+
+The model is now reduced to:
+
+.. math:: 
+
+    \begin{aligned}
+        I_{yy}\dot{q} + \left(I_{xx} - I_{zz} \right) pr
+            &= \frac{\partial M}{\partial q} q + K_T 4 b \sqrt{2} \Omega_H \delta \Omega \\
+            &= \frac{\partial M}{\partial q} q + \frac{\partial M}{\partial u} \delta \Omega 
+    \end{aligned}
+
+It also trivial to show from here that the pitch term of the mixer matrix is simply: 
+
+.. math:: 
+
+    \delta \Omega = \left( \frac{\partial M}{\partial u} \right)^{-1} \delta M 
+
+From here we can start plumbing. 
+
+This allowed me to write the equations for the entire control system. Unfortunately the transfer functions feel off. They look faster than what I expected and don't really match up with the graphs I was able to find in the paper. 
+
+The next step to verify the data would be to simulate the entire thing and see if the data that comes out looks like anything in the thesis. Once I'm confident that the models I have on paper line up with the thesis results I'll run the actual VRFT and compare the controller values. 
+
+All this work is implemented in  `this <{filename}static/04-16/quad_copter_mlx.html>`_ mlx file.
+
+Small issues in quad_copter_mlx.html: 
+    - dm/dq misprint, dm/du misprint
+    - lists
+    - b' .. ', probably linked to python 'bytes' object
+    - ° misprint at end of page

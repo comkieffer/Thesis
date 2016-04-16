@@ -47,7 +47,7 @@ This system can be re-written in two mathematically equivalent forms that howeve
         C^{(2)}(z; \theta) &= \sum_i \frac{\theta_i z^{-i}}{1 - z^{-1}} 
     \end{aligned}
 
-One has one state whereas the other has n states. As the implementer of the control system how am I supposed to deduce the intent of the system designer and, in practice, what does it change for me. The 2 control systems should be identical or at least equivalent. 
+One has one state whereas the other has n states. As the implementer of the control system how am I supposed to deduce the intent of the system designer and, in practice, what does it change for me ? The 2 control systems should be identical or at least equivalent. 
 
 This becomes an issue because it means that MATLAB does not always produce the expected output. In the above case one would expect the output to have the same structure as the basic controller however because of the way MATLAB does the calculations the result is 
 
@@ -99,7 +99,7 @@ Trying to convert from one model to the other
     Sample time: 0.05 seconds
     Discrete-time transfer function.
 
-First strategy: use ``minreal`` to cancel out poles and zeros. Not Success
+First strategy: use ``minreal`` to cancel out poles and zeros. Not a Success
 
 .. code-block:: MATLAB
 
@@ -129,7 +129,7 @@ We had more success with ``zpk``
     ans =
      
                                                                                                    
-      0.14627 (1-z^-1)^5 (1-0.03945z^-1) (1 - 1.603z^-1 + 0.9547z^-2) (1 + 0.1676z^-1 + 0.9403z^-2)
+      0.14627 (1-z^-1)^5 (1-0.03945z^-1)(1 - 1.603z^-1 + 0.9547z^-2)(1 + 0.1676z^-1 + 0.9403z^-2)
                                                                                                                                                                                
       ---------------------------------------------------------------------------------------------
                                                          
@@ -165,5 +165,5 @@ I'm most of the way there. I spent some time looking dM/du but finally found it.
 Open Questions
 --------------
 
-THw thesis estimates :math:`\hat{K}_T` and derives :math:`\hat{C}_T` from that. I calculate :math:`K_T` from that. Having the direct measurement of :math:`K_T` would be nicer. 
+The thesis estimates :math:`\hat{K}_T` and derives :math:`\hat{C}_T` from that. I calculate :math:`K_T` from that. Having the direct measurement of :math:`K_T` would be nicer. 
 
