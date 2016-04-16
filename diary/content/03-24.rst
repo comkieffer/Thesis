@@ -31,6 +31,7 @@ Comparing the 2 models:
 
 .. figure:: {filename}static/03-24/mine_vs_theirs_step.png
     :align: center
+    :alt: Comparison of step responses 
 
     Comparison of the step responses of the 2 reference models
 
@@ -52,10 +53,12 @@ Our model is faster but has higher overshoot. In hindsight I should probably bri
 
 The bode plots are also OK. 
 
-.. figure:: {filename}static/03-24/mine_vs_theirs_bode.png
+.. figure:: {filename}static/03-24/mine_vs_theirs_step.png
     :align: center
+    :alt: Comparison of the bode plots of my controller and their controller
 
     Comparison of the Bode plots of the 2 reference models
+
 
 You can view the mlx file for the comparison `here <{filename}/static/03-24/mine_vs_theirs_mlx.html>`_. 
 

@@ -1,0 +1,169 @@
+
+A New Beginning
+===============
+
+:date: 2016-04-11
+
+I met with my advisor today. He changed the thesis subject slightly to account for work done in his lab since I started this project. I'm now working on a different quad-copter. 
+
+Back to basics
+--------------
+
+One thing I need to investigate is how to extract the parameter vector from the output of the ``VRFT1_dy`` function. 
+
+The VRFT method requires that the controller be of the form:
+
+.. math::
+
+    C(z; \theta) = \beta(z)^T\theta^T
+
+Where: 
+
+* :math:`\beta = [\beta_1(z), \beta_2(z), ..., \beta_n(z)]^T` is a vector of linear transfer functions
+* :math:`\theta = [\theta_1, \theta_2, ... \theta_n]^T` is the vector of parameters
+  
+This requirement is spelled out by the main vrft paper itself: 
+
+    Attention is restricted to controllers which linearly depend on the parameter vector, namely the controller class :math:`\left \{ C(z;\ \theta) \right \}` takes the form :math:`C(z;\ \theta) = \beta^T(z)\theta`, where :math:`\beta = [\beta_1(z), \beta_2(z), ..., \beta_n(z)]^T` is a known vector of linear discrete time transfer functions and :math:`\theta = [\theta_1, \theta_2, ... \theta_n]^T` is the n-dimensional vector of parameters. 
+    
+Practically this means that the transfer function of the controller should be written: 
+
+.. math::
+
+    C(z; \theta) = C_1(z) \theta_1 + C_2(z) \theta_2 + ... + C_n(z) \theta
+
+The main vrft paper uses the following controller: 
+
+.. math:: 
+
+    C(z; \theta) = \frac{\theta_0 + z^{-1} \theta_1 + z^{-2} \theta_2 + z^{-3} \theta_3 + z^{-4} \theta_4 + z^{-5} \theta_5}{1 - z^{-1}}
+
+This system can be re-written in two mathematically equivalent forms that however have a different meaning in a control system sense:  
+
+.. math:: 
+
+    \begin{aligned}
+        C^{(1)}(z; \theta) &= \frac{1}{1 - z^{-1}} \cdot \sum_i \theta_i z^{-i} \\
+        C^{(2)}(z; \theta) &= \sum_i \frac{\theta_i z^{-i}}{1 - z^{-1}} 
+    \end{aligned}
+
+One has one state whereas the other has n states. As the implementer of the control system how am I supposed to deduce the intent of the system designer and, in practice, what does it change for me. The 2 control systems should be identical or at least equivalent. 
+
+This becomes an issue because it means that MATLAB does not always produce the expected output. In the above case one would expect the output to have the same structure as the basic controller however because of the way MATLAB does the calculations the result is 
+
+.. math:: 
+
+    C(z) = \frac{a_0 + a_1 z^{-1} + ... + a_n z^{-n}}{\left( 1 - z^{-1} \right)^6}
+
+This makes it harder to extract the values of the parameter vector. Maybe running the generated controller through ``minreal`` can fix this. 
+
+Extracting the parameter vector
+*******************************
+
+Reading through the small bits of code that are not p-code it appears that 2 of the outputs of the ``vrft_engine`` can be used to build the parameter vector: 
+
+.. code:: MATLAB
+
+    [Cr, Cy, An, Fn] = vrft_engine(u,y1,y2,M,[],B,[],L,[],k,'n');
+
+Where ``Cr`` is the controller from ``r`` to ``y`` and ``Cy`` is the controller from ``d`` to ``y``. ``VRFT1_ry`` returns ``Cr`` and ``VRFT1_dy`` returns ``Cy``. ``An`` and ``Fn`` however are not documented anywhere. 
+
+Some code uses them as such:    
+
+.. code:: MATLAB
+
+    teta_vector = inv(An)*Fn;
+    C = minreal(teta_vector' * B);
+
+This snippet is used as part of ``VRFT1_ry_ru`` where it used to build a controller that blends reference models on ``r`` to ``y`` and ``r`` to ``u``. Experimentally ``teta_vector`` matches the values we calculate by hand from the ``OptimalController``. I created a new function ``VRFT1_dy_theta`` that adds ``teta_vector`` to its outputs. 
+
+Trying to convert from one model to the other
+*********************************************
+
+.. code-block:: MATLAB
+
+    >> OptimalController
+
+    OptimalController =
+     
+                                                                                     
+      0.1463 - 0.947 z^-1 + 2.787 z^-2 - 5.057 z^-3 + 6.521 z^-4 - 6.451 z^          
+                                                                                     
+              -5 + 4.928 z^-6 - 2.721 z^-7 + 0.9536 z^-8 - 0.165 z^-9 + 0.00518 z^-10
+                                                                                     
+      -------------------------------------------------------------------------------
+                                                                         
+                 1 - 6 z^-1 + 15 z^-2 - 20 z^-3 + 15 z^-4 - 6 z^-5 + z^-6
+                                                                         
+     
+    Sample time: 0.05 seconds
+    Discrete-time transfer function.
+
+First strategy: use ``minreal`` to cancel out poles and zeros. Not Success
+
+.. code-block:: MATLAB
+
+    >> minreal(OptimalController)
+
+    ans =
+     
+                                                                                     
+      0.1463 - 0.947 z^-1 + 2.787 z^-2 - 5.057 z^-3 + 6.521 z^-4 - 6.451 z^          
+                                                                                     
+              -5 + 4.928 z^-6 - 2.721 z^-7 + 0.9536 z^-8 - 0.165 z^-9 + 0.00518 z^-10
+                                                                                     
+      -------------------------------------------------------------------------------
+                                                                         
+                 1 - 6 z^-1 + 15 z^-2 - 20 z^-3 + 15 z^-4 - 6 z^-5 + z^-6
+                                                                         
+     
+    Sample time: 0.05 seconds
+    Discrete-time transfer function.
+
+We had more success with ``zpk``
+
+.. code-block:: matlab
+
+    >> zpk(OptimalController)
+
+    ans =
+     
+                                                                                                   
+      0.14627 (1-z^-1)^5 (1-0.03945z^-1) (1 - 1.603z^-1 + 0.9547z^-2) (1 + 0.1676z^-1 + 0.9403z^-2)
+                                                                                                                                                                               
+      ---------------------------------------------------------------------------------------------
+                                                         
+                                               (1-z^-1)^6
+                                                     
+ 
+    Sample time: 0.05 seconds
+    Discrete-time zero/pole/gain model.
+
+Here the extra ``(1-z^-5)`` introduced by MATLAB is immediately obvious. Unfortunately I don't know how to get rid of it. This means that I still don't know how to make the controller look like the desired controller family. 
+
+Taking a look at the new quad-copter model
+------------------------------------------
+
+Good news. I can mode forward. The controller structure is the same: PD on the outer loop, PID on the inner loop. This is a standard for quadcopters but seems like a weird choice, wouldn't a PD be faster than a PID ? 
+
+.. math:: 
+
+    \begin{aligned}
+        C_i(z) &= K_{Pi} + K_{Ii} \frac{1}{s} + K_{Di} \frac{s}{1 + sT_f} \\
+        C_o(z) &= k_{Po} + K_{Do} \frac{s}{1 + sT_f}
+    \end{aligned}
+
+The :math:`T_f` term would be hard to fit into the VRFT framework since it introduces a non-linear dependence on the parameter vector. In the cascade vrft paper it is fixed using results from a model based approach. This means I need to ask my prof for a value if I can't find it in the paper. 
+
+Work done today
+---------------
+
+I met my professor this morning for new guidance and intructions. I spent some time investigating one of the things we discussed (see the first section of this post). I then switched gears to get started on the quad-copter model. I've started a new ``mlx`` file to do the work. Most of my time so far has been spent going through the paper looking for values needed to build the models.
+
+I'm most of the way there. I spent some time looking dM/du but finally found it. 
+
+Open Questions
+--------------
+
+THw thesis estimates :math:`\hat{K}_T` and derives :math:`\hat{C}_T` from that. I calculate :math:`K_T` from that. Having the direct measurement of :math:`K_T` would be nicer. 
+

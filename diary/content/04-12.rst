@@ -1,0 +1,32 @@
+
+Making a Model
+==============
+
+:date: 2016-04-12
+
+Yesterday before I stopped I was writing the equations for the mathematical model of the quad-copter. 
+
+According to the thesis, the value of :math:`\frac{\partial M}{\partial u}` can be chosen as either the *guessed* value or estimated from :math:`\hat{K}_T` and :math:`\hat{C}_T`. I'm not entirely clear on how the guessed value was determined and how much it differs from the value I would obtain from :math:`\hat{K}_T` since I am missing some crucial data. 
+
+After plotting the bode diagram of the model and comparing with figure 6.5 to check that plausibility of the result I started looking at how to generate the input signal. The work suggests a PRBS as the test input. This is obtained with : 
+
+.. code-block:: matlab
+
+    in = idinput(N, 'prbs', [0 band], [minu, maxu]);
+
+Where ``N`` is the number of samples, ``band`` is the bandwidth of the generated sequence and ``minu`` and ``maxu`` are the low and high values for the signal. 
+
+I don't know any of these parameters. N I can set to a random value. The others not so much. 
+
+I then moved on to  writing  the controllers. writing the pid is easy. Unfortunately I hit a road block just after. I have no idea how to connect the blocks together. The mixer matrix is supposed to sit in the middle but I'm only using a subset of the mixer matrix. When I grab just the line that I'm interested in then the output will always be 0. I need to investigate more but my brain is fried. 
+
+Time to go home for today. 
+
+Questions:
+----------
+
+* How was the guess value for :math:`\frac{\partial M}{\partial u}` chosen ? 
+* What are the values of :math:`\Omega_h` or the mass of the quad-copter. Two pieces of information I need to calculate :math:`\frac{\partial M}{\partial u}`.
+* What is the sample time for the system ? I remeber reading the the FCU runs at 100Hz. Is that it ?
+* What ``bandwidth`` and ``signal_peak`` should I use to calculate the PRBS
+* What bit of the mixer matrix do I need for this ? 

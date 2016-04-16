@@ -41,7 +41,7 @@ This allows us to write that:
 
 .. math::
 
-    r_i(t) = e_i(t) + y_i(t) = C_i^{-1}(z) \quad u(t) + y_i(t) 
+    r_i(t) = e_i(t) + y_i(t) = C_i^{-1}(z) \ u(t) + y_i(t) 
 
 The calculation for :math:`e_i(t)` is only allowed if :math:`C_i` is minimum phase (has all its poles and zeros inside the unit circle) otherwise we must choose a different reference model such that :math:`C_i` is minimum phase.
 

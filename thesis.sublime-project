@@ -4,10 +4,9 @@
 		{
 			"path": ".",
             "folder_exclude_patterns": [
-                "diary/pelican/.pelican_env",
-                "diary/pelican/aboutwilson",
-                "diary/pelican/output",
-                "diary/pelican/plugins"
+                "diary/pelican/aboutwilson/",
+                "diary/pelican/output/",
+                "diary/pelican/plugins/"
             ]
 		}
 	],
