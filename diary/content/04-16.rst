@@ -74,7 +74,7 @@ The model is now reduced to:
     \begin{aligned}
         I_{yy}\dot{q} + \left(I_{xx} - I_{zz} \right) pr
             &= \frac{\partial M}{\partial q} q + K_T 4 b \sqrt{2} \Omega_H \delta \Omega \\
-            &= \frac{\partial M}{\partial q} q + \frac{\partial M}{\partial u} \delta \Omega 
+            &= \frac{\partial M}{\partial q} q + \frac{\partial M}{\partial u} \delta \Omega \ , \quad \frac{\partial M}{\partial u} = K_T 4 b \sqrt{2} \Omega_H
     \end{aligned}
 
 It also trivial to show from here that the pitch term of the mixer matrix is simply: 
@@ -91,8 +91,4 @@ The next step to verify the data would be to simulate the entire thing and see i
 
 All this work is implemented in  `this <{filename}static/04-16/quad_copter_mlx.html>`_ mlx file.
 
-Small issues in quad_copter_mlx.html: 
-    - dm/dq misprint, dm/du misprint
-    - lists
-    - b' .. ', probably linked to python 'bytes' object
-    - ° misprint at end of page
+

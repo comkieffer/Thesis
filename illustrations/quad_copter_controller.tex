@@ -1,0 +1,51 @@
+\documentclass[convert={outext=.png}]{standalone}
+\usepackage{tikz}
+
+% Compile with: lulatex -shell-escape vrft_block_diagram_standalone.tex
+
+\tikzset{
+	block/.style  = {draw, fill=white, rectangle, minimum height=3em, minimum width=3em, node distance = 2cm},
+	sum/.style    = {draw, fill=white, circle, node distance=1cm},
+	input/.style  = {coordinate},
+	output/.style = {coordinate},
+	hidden/.style  = {coordinate},
+}
+
+\begin{document}
+	\begin{tikzpicture}[auto, trim left, scale=0.1, >=latex]
+	% Draw the main control loop nodes
+	\draw
+	node[input                           ] (input) {}
+	node[hidden, right of = input        ] (oinputfork) {}
+	node[sum   , right of = oinputfork   ] (osum) {}
+	node[block , right of = osum         ] (ocontroller) {$C_o$}
+	node[hidden, right of = ocontroller  ] (iinputfork) {}
+	node[sum   , right of = iinputfork   ] (isum) {}
+	node[block , right of = isum         ] (icontroller) {$C_i$}
+	node[block , right of = icontroller  ] (mixer)  {$\chi$}
+	node[block , right of = mixer        ] (iplant) {$P_i$}
+	node[hidden, right of = iplant       ] (ioutputfork) {}
+	node[block , right of = ioutputfork  , node distance = 1.5cm] (oplant) {$P_o$}
+	node[hidden, right of = oplant       ] (ooutputfork) {}
+	node[output, right of = ooutputfork  ] (output) {}
+	node[hidden, below of = iplant       ] (iretroaction) {}
+	node[hidden, below of = iplant       ] (iretroaction) {}
+	node[hidden, below of = iretroaction ] (oretroaction) {};
+	
+	% Connect everything together
+	\draw[->] (input) -- (oinputfork) node[above] {$\Theta°$}   -- (osum);
+	\draw[->] (osum) -- (ocontroller) node[midway] {$e_{\Theta}$};
+	\draw[->] (ocontroller) -- (iinputfork) -- (isum) node[midway] {$q°$};
+	\draw[->] (isum) -- (icontroller) node[midway] {$e_q$};
+	\draw[->] (icontroller) -- (mixer) node[midway] {$\delta M$};
+	\draw[->] (mixer) -- (iplant) node[midway] {$\delta \Omega$};
+	\draw[->] (iplant) -- (ioutputfork) node[above] {$q$} -- (oplant) ;
+	\draw[->] (oplant) -- (ooutputfork) --  (output) node[midway] {$\Theta$};
+	
+	% Draw retroactions
+	\draw[->] (ioutputfork) |- (iretroaction) -| (isum) node[pos=0.9] {$-$};
+	\draw[->] (ooutputfork) |- (oretroaction) -| (osum) node[pos=0.9] {$-$};
+	
+	\end{tikzpicture}
+	
+\end{document}
