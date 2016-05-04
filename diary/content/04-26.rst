@@ -1,0 +1,22 @@
+
+
+Making some progress ?
+======================
+
+:date: 2016-04-26
+
+Very little work this morning. My phone is breaking down and I spent most of my morning looking for replacement parts. 
+
+This afternoon after the usual struggle with MATLAB hogging up to much memory I got to work. Discovered that there doesn't seem to be a documented way of running ``mlx`` files from the command window. The usual ``run script-name`` doesn't work. 
+
+The objective today is to build a script to compare the results of the MATLAB and Simulink models so that I will know when they match up. 
+
+Discoveries of the day:
+
+#. The controllers in figure 7.1 (p83) are mis-labelled. The outer controller is the PID whilst the inner is the PD. This confirms my gut feeling.
+#. I still don't know shit. 
+   
+Something really weird is going on ... The Pitch Rate plot looks waaaaaay to much like the expected Pitch Angle model. Why ??
+
+.. figure:: {filename}static/04-26/pitch-rate.png
+    :alt: Pitch Rate of the quad copter

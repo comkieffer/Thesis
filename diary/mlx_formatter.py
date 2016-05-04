@@ -74,7 +74,6 @@ MLX_TEMPLATE = '''
 
 
 def convert(in_file, out_file):
-
     # Load the template used to render the output file. 
     jinja = Environment(loader=PackageLoader('mlx_formatter', 'templates'))
     # template = jinja.get_template('mlx_base.html')

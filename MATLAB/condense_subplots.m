@@ -9,6 +9,10 @@
 % will strip the ticks on the x axis from the upper plot and move the 2 plots
 % closer together expanding them as necessary to fill the empty space.
 %
+% By default, the script will still leave enough space for the tick labels of
+% the plots not to overlap. To minimse the space between the 2 plots use the
+% |tight| option.
+%
 % Inputs:
 % 
 % >> condense_subplots('name', 'value', ...)
@@ -19,8 +23,8 @@
 % |gcf| is used.
 % * upper, The index of the upper plot in the |handle.Children| array. If not
 % specified, 2 is used.
-% * lower, The index of the lowerer plot in the |handle.Children| array. If not
-% specified, 2 is used.
+% * lower, The index of the lower plot in the |handle.Children| array. If not
+% specified, 1 is used.
 % * padding, The amount of free space between the 2 figures. If not specified
 % .08 is used. The padding should be specified in MATLAB figure units (from 0 to
 % 1).
@@ -28,45 +32,34 @@
 % reduced even more and the tick labels on the y axis are adjusted so as not to
 % overlap.
 % 
-% Note: The script assumes that there are only 2 subplots in the figure. 
+% TODO: replace upper and lower with |plotOrder| to support more subplots
 
 function condense_subplots(varargin)
     ip = inputParser(); 
-    ip.addOptional('handle', gcf()); 
-    ip.addParameter('upper', -1);
-    ip.addParameter('lower', -1);
-    ip.addParameter('padding', .08);
-    ip.addParameter('tight', false);
+    ip.addOptional('handle', gcf()); % @ishandle 
+    ip.addOptional('plotOrder', []); % @isnumeric
+    ip.addParameter('padding', .08); % @isnumeric, iscalar
+    ip.addParameter('tight', false); % @isbool
     ip.parse(varargin{:});
     
     % Extract the children that are axis objects
     fig_axes = ip.Results.handle.Children(...
         arrayfun(@(x) isa(x, 'matlab.graphics.axis.Axes'), ip.Results.handle.Children));
-    if ip.Results.upper == -1 || ip.Results.lower == -1
-        if length(fig_axes) ~= 2
-            error('CondenseSubplots:Error', 'Unsupported number of plots. Specify the subplots manually with the ''upper'' and ''lower'' options');
-        end
+    
+    plotOrder = ip.Results.plotOrder;
+    if isempty(plotOrder)
+        % If the order of the plots is not specified then we reverse the order
+        % of the extracted figure handles. This gives us the list of the plots
+        % from top to bottom (usually).
+        plotOrder = fig_axes(end:-1:1); 
     end
     
-    if ip.Results.upper == -1
-        upper_axis = fig_axes(2);
-    else
-        upper_axis = ip.Results.handle.Children(ip.Results.upper);
+    for k = 2:length(plotOrder)
+       adjust_subplots(plotOrder(k-1), plotOrder(k), ip.Results);
     end
-    
-    if ip.Results.lower == -1
-        lower_axis = fig_axes(1);
-    else
-        lower_axis = ip.Results.handle.Children(ip.Results.lower);
-    end
-    
-    if lower_axis == upper_axis
-        error('CondenseSubplots:Error', 'Upper and Lower plot cannot be the same');
-    end    
-    
-    % After all this wrangling of parameters we can get to the meat of the
-    % problem ...
-    
+end
+
+function adjust_subplots(upper_axis, lower_axis, opts)
     % FixMe: Hacky - Hacky way of figuring out if the 2 arays are the same
     if ~(length(upper_axis.XTick) == length(lower_axis.XTick) && ...
        sum(upper_axis.XTick == lower_axis.XTick) == length(upper_axis.XTick))
@@ -85,11 +78,23 @@ function condense_subplots(varargin)
     lower_pos = make_struct(lower_axis.Position);
     
     free_space = upper_pos.y - (lower_pos.y + lower_pos.h); 
-    move_amount = (free_space - ip.Results.padding) / 2;
+    move_amount = (free_space - opts.padding) / 2;
     
-    if ip.Results.tight
-        % upper_axis.YTickLabel{1} = ' '; 
-        % lower_axis.YTickLabel{end} = ' ';
+    if opts.tight
+        upper_ymin = upper_axis.YLim(1);
+        upper_ytick_min = upper_axis.YTick(1);
+        
+        if upper_ymin == upper_ytick_min
+            upper_axis.YTickLabel{1} = ' ';
+        end
+        
+        lower_ymax = lower_axis.YLim(2);
+        lower_ytick_max = lower_axis.YTick(end);
+        
+        if lower_ymax == lower_ytick_max
+            lower_axis.YTickLabel{end} = ' ';
+        end
+        
         move_amount = (free_space - .01) / 2;
     end
     
