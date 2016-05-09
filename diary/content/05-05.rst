@@ -1,0 +1,133 @@
+
+VRFT Time
+=========
+
+:date: 2016-05-05
+
+Today I need to figure out why the VRFT controller is sooo fucked up ...
+
+Expanding a PID
+---------------
+
+.. math::
+
+    \begin{aligned}
+        G(s) &= K_p + K_i \frac{1}{s} + \frac{K_ds}{1 + sT_f} \\
+             &= \frac{K_p s + K_i}{s} + \frac{K_d s}{1 + sT_f} \\
+             &= \frac{k_p s (1 + s T_f) + K_i (1 + s T_f) + Kd s^2}{s (1 + s T_f)} \\
+             &= \frac{k_p  s + K_p T_f s^2 + K_i + K_i T_f s + K_d s^2}{s^2 T_f + s} \\
+             &= \frac{(K_p T_f + K_d) s^2 + (K_p + K_i T_f) s + K_i}{s^2 T_f + s} 
+    \end{aligned}
+
+Expanding a discrete time PID
+-----------------------------
+
+.. math:: 
+
+    \begin{aligned}
+        G(s) &= k_p + K_i \frac{T_s}{z - 1} + K_d \frac{1}{T_f + \frac{T_s}{z - 1}} \\
+             &= k_p + K_i \frac{T_s}{z - 1} + K_d \frac{1}{T_f + \frac{T_s}{z - 1}} \\
+             &= \frac{K_p (z - 1) + K_i T_s}{z - 1} + K_d \frac{z - 1}{T_f (z - 1) + T_s} \\
+             &= \frac{\left( K_p z - K_p + K_i T_s \right) \left( T_f (z - 1) + T_s \right) 
+                      + K_d (z - 1)^2}{(z - 1) \left( T_f (z - 1) + T_s\right)} \\
+             &= \frac{(K_p T_f z^2 - K_p T_f z + K_p T_s z) (-K_p T_f z + K_p T_f - K_p T_s)
+                      (K_i T_s T_f z - K_i T_s T_f + K_i T_s^2)(K_d z^2 - 2 K_d z + K_d)}
+                     {T_f z^2 +(T_s - 2 T_F) z + (T_f - T_s)} \\
+             &= \frac{(K_p T_f + K_d) z^2 + 
+                      (-2 K_p T_f + K_p T_s + K_i T_s T_f - 2 K_d) z +
+                      (K_p T_f - K_p T_s - K_i T_s T_f + K_i T_s ^2 +K_d)}
+                     {T_f z^2 + (T_s - 2 T_f) z + (T_f - T_s)}                     
+    \end{aligned}
+
+We can isolate the different terms of the equation such that: 
+
+.. math::
+
+    G(s) = \frac{a_2 z^2 + a_1 z + a_0}{b_2 z^2 + b_1 z + b_0}
+
+Comparing the two equations we have: 
+
+.. math:: 
+
+    \begin{aligned}
+        a_2 &= K_p T_f + K_d \\
+        a_1 &= -2 K_p T_f + K_p T_s + K_i T_s T_f - 2 K_d \\
+        a_0 &= K_p T_f - K_p T_s - K_i T_s T_f + K_i T_s ^2 +K_d \\
+        b_2 &= T_f \\
+        b_1 &= T_s - 2 T_f \\
+        b_0 &= T_f - T_s
+    \end{aligned}
+
+In the case where :math:`T_f = T_s = T` the equations reduce to: 
+
+.. math::
+
+    \begin{aligned}
+        a_2 &= K_p T_f + K_d \\
+        a_1 &= - K_p T + K_i T^2 - 2 K_d \\
+        a_0 &= K_d \\
+        b_2 &= T \\
+        b_1 &= - T \\
+        b_0 &= 0 
+    \end{aligned}
+
+This provides a hint as to why the controller obtained through VRFT has a correct denominator. The denominator is not affected by the PID parameters but by the fixed time constant and sampling interval. 
+
+If only I knew why. Compare the ``OptimalInnerController``, the PID produced by the VRFT method and the original PID controller:
+
+.. code-block:: matlab
+
+    >> tf(c2d(Ri, Ts))
+
+    ans =
+     
+      0.562 z^2 - 1.076 z + 0.5245
+      ----------------------------
+         z^2 - 1.368 z + 0.3679
+     
+    Sample time: 0.01 seconds
+    Discrete-time transfer function.
+
+    >> tf(OptimalInnerController)
+
+    ans =
+     
+      24.02 z^2 - 44.3 z + 20.94
+      --------------------------
+        z^2 - 1.368 z + 0.3679
+     
+    Sample time: 0.01 seconds
+    Discrete-time transfer function.
+
+For reference purposes we compare a discretised continuous time PID with an actual discrete time PID: 
+
+.. code-block:: matlab
+
+    >> tf(c2d(pid(1, 1, 1, 1), 1))
+
+    ans =
+     
+       2 z^2 - 2.368 z + 1
+      ----------------------
+      z^2 - 1.368 z + 0.3679
+     
+    Sample time: 1 seconds
+    Discrete-time transfer function.
+
+    >> tf(pid(1, 1, 1, 1, 1))
+
+    ans =
+     
+      2 z^2 - 2 z + 1
+      ---------------
+          z^2 - z
+     
+    Sample time: 1 seconds
+    Discrete-time transfer function.
+
+It is immediately obvious that even though the numerators are slightly different they are similar. The output of the VRFT is completely fucked up.
+
+
+Turns out that the root of the issue is that I forgot to take the Mixer into account when trying to run the VRFT. After fixing that everything went swimmingly ! 
+
+Next step: the outer controller. Here is where I'm struggling. It just isn't coming out right ... I wasn't able to figure it out today. Tomorrow I'll make a break hopefully.

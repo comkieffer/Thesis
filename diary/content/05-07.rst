@@ -1,0 +1,20 @@
+
+Time to finish ?
+================
+
+:date: 2016-05-07
+
+Today I want to finish the outer loop controls. 
+
+In the simulink model the output of the outer controller (q Set-Point) is too slow. The inner controller can however follow this signal easily.
+
+We observe that: 
+
+- The output of the outer reference model exactly follows the original control system as expected.
+- The calculated virtual reference for the outer loop is correct. 
+
+Mistake Found !! 
+    
+Turns out if you run VRFT on the wrong data you get the wrong result !! I was running the VRFT for the outer loop with the data from the inner loop. When I changed that everything went great. 
+
+This final mlx file can be found `here <{filename}static/05-07/quad-copter_mlx.html>`_.

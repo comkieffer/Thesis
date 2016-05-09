@@ -26,7 +26,7 @@ To apply VRFT on the outer loop we need to know the input and output of the *out
 
 .. math::
 
-    y_o(t) = \frac{C_i P_i}{1 + C_i P_i} \cdot P_o \cdot r_i(t)
+    y_o(t) = \left( \frac{C_i P_i}{1 + C_i P_i} \cdot P_o \right) r_i(t)
 
 However we have enough information to able to calculate it. We know that the error signal is:
 

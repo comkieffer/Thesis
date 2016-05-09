@@ -18,5 +18,9 @@ Discoveries of the day:
    
 Something really weird is going on ... The Pitch Rate plot looks waaaaaay to much like the expected Pitch Angle model. Why ??
 
-.. figure:: {filename}static/04-26/pitch-rate.png
-    :alt: Pitch Rate of the quad copter
+I have no idea.
+
+Corrections:
+------------
+
+Looking back on this all my conclusions were wrong. The controllers were not mislabelled but their parameters in the table were. I have no idea what was going on with the plot. Blame it on a forgotten ``clear all``.

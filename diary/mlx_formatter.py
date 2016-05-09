@@ -49,7 +49,7 @@ MLX_TEMPLATE = '''
 
         <script type="text/x-mathjax-config">
             MathJax.Hub.Config({
-              tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+              tex2jax: {inlineMath: [['$','$'], ['\\\\(','\\\\)']]}
             });
         </script>
 
@@ -85,19 +85,17 @@ def convert(in_file, out_file):
 
     soup = BeautifulSoup(html_source, 'html.parser', from_encoding="utf-8")
     style = soup.head.style
-    
-    # FIXME !
-    # print('Replacing equation images with latex ')
+
     convert_equations(soup)
 
     # Process sections to extract their outputs and put them in a second pane
     sections = soup.find_all('div', 'SectionBlock')
-    # print('\nLocated {} sections in the input.\n'.format(len(sections)))
+    
     split_sections = [process_section(s) for s in sections]
 
-    title = 'Matlab Live Script'
-    if len(sections) >= 1: 
-        title = extract_section_title(sections[0])
+    # Extrac the document title. If the mlx document does not have a title then this string  will 
+    # be empty. 
+    title = soup.title.string; 
 
     with open(out_file, 'w') as file:
         file.write(template.render(
@@ -177,8 +175,6 @@ def process_section(section):
     code and equations in the left pane and the textual output ad figure in the right pane. 
     """
 
-    # print('Section: {}'.format(extract_section_title(section)))
-
     output_paragraphs = section.find_all('div', 'outputParagraph')
     # print('  Found {} output blocks'.format(len(output_paragraphs)))
 
@@ -204,28 +200,6 @@ def process_section(section):
     section = section.encode_contents(formatter='html')
 
     return (section, outputs)
-
-
-def extract_section_title(section):
-    # If the section has a title defined then the job is easy
-    title = section.h2
-
-    # If the section does not have a title then we need to get creative. We simply use the text of 
-    # the first, non code section, or if the node contains only code the first line
-    if not title:
-        text_only = copy.copy(section)
-        
-        # Remove code nodes
-        code_nodes = text_only.select('.LineNodeBlock')
-        for node in code_nodes:
-            node.extract()
-
-        if len(text_only.contents):
-            title = text_only.contents[0]
-        else:
-            title = section
-
-    return title.get_text()[:70] 
 
 
 def trim_empty_code_lines(section):
