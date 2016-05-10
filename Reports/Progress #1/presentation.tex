@@ -1,0 +1,122 @@
+\documentclass{beamer}
+
+\usepackage{default}
+
+\usepackage{amsmath}
+
+\usepackage[numbered,framed]{matlab-prettifier}
+\lstset{
+	basicstyle=\fontsize{10}{12}\selectfont\ttfamily
+}
+
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
+\usepackage{pgfplots} 
+\pgfplotsset{compat=newest}
+\pgfplotsset{plot coordinates/math parser=false}
+\pgfplotsset{minor grid style={dotted, gray}}
+\pgfplotsset{major grid style={dashed, gray}}
+
+\newlength\figureheight            % Set tikz figre sizes.
+\newlength\figurewidth
+\setlength\figureheight{6cm} 
+\setlength\figurewidth{0.8\textwidth}
+
+% Title Page
+\title{Thesis Progress Report \#1}
+\subtitle{Identifying the controllers with VRFT}
+
+\author{Thibaud Chupin}
+\date{May 2016}
+
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}[fragile]
+	\frametitle{The Quad-Copter Model}
+	
+	\begin{lstlisting}[style=Matlab-editor, gobble=8, tabsize=4]
+		Iyy = 34.7e-3;   % kg m^2
+		dM_q = -46.3e-3; % N m s
+		dM_u = 15e-3;    % Nms
+		
+		A = [1 / Iyy * dM_q,  0;
+			 1             ,  0 ];
+		B = [1 / Iyy * dM_u; 0];
+		C = [1 0];
+		D = 0;
+		
+		PitchRateModel = ss(A, B, C, D, ...
+			'InputName', 'Delta Omega', ...
+			'OutputName', 'Pitch Rate (q)');
+		
+		Mixer = dM_u^-1;
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Closing the loop}
+	
+	\begin{lstlisting}[
+		style=Matlab-editor, gobble=8, tabsize=4,
+		mlsharedvars={InnerReferenceModel, OuterReferenceModel}
+	]
+		Tf = .01; % cf. p87 (Bottom right)
+		
+		Ro = pid(.3, 0, .3, Tf);
+		Ri = pid(.05, 1.61, .00512, Tf); 
+
+		InnerLoop = loopsens(...
+			PitchRateModel * Mixer, Ri);
+		InnerReferenceModel = tf(InnerLoop.Ti);
+		
+		integrator = tf(1, [1 0]);
+		OuterLoop = loopsens(...
+			integrator * InnerReferenceModel, Ro);
+		OuterReferenceModel = tf(OuterLoop.Ti);
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Model Verification}
+	
+	\begin{figure}
+		\input{tikz/pitch_rate_model_out.tikz}
+		\caption{Pith rate and pitch angle when the \texttt{PitchRateModel} is fed a PRBS sequence guessed from figure 6.6 (p80).}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Closed loop behavior}
+	
+	\begin{figure}
+		\setlength\figureheight{5cm} 
+		\input{tikz/closed_loop_steps_out.tikz}
+		\caption{Closed loop behavior of the system using the original controllers.}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{VRFT Results - Inner Controller}
+	
+	The code here is omitted since it produces correct results and is longer. 
+	
+	\begin{figure}
+		\input{tikz/vrft_inner_bode.tikz}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{VRFT Results - Outer Controller}
+	
+	The code here is omitted since it produces correct results and is longer. 
+	
+	\begin{figure}
+		\input{tikz/vrft_outer_bode.tikz}
+	\end{figure}
+\end{frame}
+
+\end{document}
