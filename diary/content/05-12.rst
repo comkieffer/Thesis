@@ -1,0 +1,25 @@
+
+Back to looking for mistakes
+============================
+
+:date: 2016-05-12
+
+Yesterday we noticed that the vrft procedure was returning incorrect results with the new controllers. Time to find out why. 
+
+First I tried to reset the controller params to what they previously were. The original and VRFT controllers sync up. Changing the controllers to the correct values makes things wrong again. The controllers look nothing alike.
+
+The complementary sensitivity for the outer loop sync up fine. The inner loop is more complicated. The phase syncs up but the magnitude doesn't. There seems to be something wrong with the inner reference model. The step response shows an error term that should not be present since the inner controller is PID.
+
+.. figure::{filename}static/05-12/inner_ref_step_response.png
+    :alt: step response of the inner loop 
+
+
+This is reeeeeeealy weird ! 
+
+Fix 1: Turns out that I copied the PID params wrong. With the correct values this behaviour disappears. 
+
+Next weird issue: The controller produced by VRFT and the controller produced by the parameter vector don't sync up. Why ?
+
+I still don't have an answer. The output of the VRFT is highly dependant on the input data. If I pass in a step response then the controller is even worse than it should be. I guess that means that I am doing something wrong with the VRFT params. 
+
+I'll investigate more tomorrow.

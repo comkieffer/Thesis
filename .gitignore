@@ -24,8 +24,39 @@ Other Resources/*
 srv.pid
 pelican.pid
 
-# Ignore latex junk files
-illustrations/*.pdf
-illustrations/*.aux
-illustrations/*.log   
-illustrations/*.synctex.gz
+## Ignore latex junk files
+## There are soooo many of them and this is just a subset !
+
+# Core latex/pdflatex auxiliary files:
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+
+## Bibliography auxiliary files (bibtex/biblatex/biber):
+*.bbl
+*.bcf
+*.blg
+*-blx.aux
+*-blx.bib
+*.brf
+*.run.xml
+
+## Build tool auxiliary files:
+*.fdb_latexmk
+*.synctex
+*.synctex.gz
+*.synctex.gz(busy)
+*.pdfsync
+
+# beamer
+*.nav
+*.snm
+*.vrb
