@@ -1,0 +1,14 @@
+
+Back from another loooong break
+===============================
+
+:date: 2016-07-04
+
+ 
+I encountered a variety of issues with the VRFT tool that forced to stop and wait, then exams got in the way of making further progress. 
+
+Update for today. I continued some previous work I had started to improve the performance of the system. I am using a 2nd order system as a reference model because that makes it easy to tune the performance. 
+
+The `mlx` file that implements this is `here <{filename}static/07-04/outer_vrft_tuning_mlx.html>`_. This approach seems to work rather well.  
+
+I also went back to check that the VRFT produces acceptable values for the outer loop and they look fine. The bode diagrams and step responses are indistinguishable. Check out the `work <{filename}static/07-04/outer_vrft_mlx.html>`_ 

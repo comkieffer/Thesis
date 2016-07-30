@@ -14,7 +14,7 @@ What I know:
 - The ct and dt variants of ``InnerRefeenceModel`` have the same dynamics.
 
 
-..code-block:: matlab
+.. code-block::matlab
 
     >> cloop = loopsens(PlantModel_dt, OptimalController); 
     >> zpk(cloop.Ti)
@@ -30,3 +30,6 @@ What I know:
     Discrete-time zero/pole/gain model. 
 
 Considering that ``PlantModel_dt`` contains ``Mixer`` the presence of the unstable pole is worrying.
+
+After another day of work I'm n closer to finding the solution to the problems. I created ``inner_vrft.mlx`` (`mlx link <{filename}static/05-13/inner_vrft_mlx.html>`_) to re-do the vrft from scratch and came up with the same results. I have no idea where to go from here.
+

@@ -2,7 +2,7 @@
 More Work ! Yay !
 ==================
 
-:date: 2016-11-05
+:date: 2016-05-11
 
 Met with my advisor this morning. He gave me correct parameter for the PIDs. The new controllers give the system the right response time. Unfortunately this broke something else. The VRFT PIDs are waaaaaay out of whack !
 
