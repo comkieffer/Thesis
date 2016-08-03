@@ -1,0 +1,53 @@
+Making sense of the data
+========================
+
+:date: 2016-08-04
+
+I have new information on the data ! The input signal :math:`u` is more than just a percentage. It is the difference in throttle between the front and the right motor expressed in percentages. 
+
+Written simply it is:
+    
+.. math::
+
+    \begin{aligned}
+        u &= (Throttle Front)_{\%} - (Throttle Rear)_{\%} \\
+          &= \Omega_{F\%} - \Omega_{R\%}
+    \end{aligned}
+
+If we recall the conventions used in the previous work then: 
+
+.. math::
+    \begin{alignedat}{4}
+        \delta \Omega_F &&= \Omega_F - \Omega_H \quad &&\Rightarrow&& \quad \Omega_F &&= \delta \Omega_F + \Omega_H\\
+        \delta \Omega_R &&= \Omega_R - \Omega_H \quad &&\Rightarrow&& \quad \Omega_R &&= \delta \Omega_R + \Omega_H\\
+    \end{alignedat}
+
+The control scheme imposes that :math:`\delta \Omega_F = -\delta \Omega_R = \delta \Omega`. By substituting this information into the previous results we arrive at:
+
+.. math::
+
+    \begin{aligned}
+        \Omega_F &= \delta \Omega + \Omega_H \\
+        \Omega_R &= -\delta \Omega + \Omega_H
+    \end{aligned}
+
+Which allows us to rewrite the expression of the input :math:`u` as: 
+
+.. math::
+
+    \begin{aligned}
+        u &= (\delta \Omega + \Omega_H)_{\%} - (-\delta \Omega + \Omega_H)_{\%} \\
+          &= 2 \cdot \delta \Omega_{\%}
+    \end{aligned}
+
+However this doesn't bring us any closer to calculating the expression of :math:`\delta \Omega_{\%}`. Assuming that:
+
+.. math::
+
+    \delta \Omega_{\%} = \dfrac{\delta \Omega}{\delta \Omega_{Max}} \cdot 100
+
+Then we still need the value of :math:`\delta \Omega_{Max}` to make any headway. 
+
+
+
+
