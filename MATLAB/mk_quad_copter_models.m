@@ -61,9 +61,34 @@ PIDControllerClass_dt = c2d(PIDControllerClass, Ts);
 PDControllerClass = [ 1, tf([1 0], [Tf 1]) ].';
 PDControllerClass_dt = c2d(PDControllerClass, Ts);
 
+%% Angle Test Sequence
+
+step_size = .18;     % Rough guess from the figures
+step_duration = 600; % Estimated 6s per state, 100 samples per second
+time_step = .01;     % 100 samples/sec. Extrapolated from FCU freq (100Hz)
+test_time_vec = time_step * [0:(70/time_step)]'; 
+
+base = ones(1, step_duration);
+test_theta_set_point = [
+    base * 0, base * -1 * step_size, base * 0, base * step_size, base * 0, ...
+    base * -2 * step_size, base *  0, base * 2 * step_size, base * 0,      ...
+    base * -3 * step_size, base *  0, base * 3 * step_size, base * 0,      ...
+]';
+
+% Crop the input sequence to the size of the time vector
+test_theta_set_point = test_theta_set_point(1:length(test_time_vec));
+
+% Build a |timeseries| object from the input data so that we can pass it into
+% Simulink as an input signal
+PitchTestSequence.Time = test_time_vec;
+PitchTestSequence.Theta = test_theta_set_point; 
+
 %% Convenience functions that don't really deserve their own file
 
 mk_2nd_order = @(omega, zeta) tf(omega^2, [1, 2*omega*zeta, omega^2]);
+
+bode_no_phase = bodeoptions('cstprefs');
+bode_no_phase.PhaseVisible = 'off';
 
 %% Save all the relevant variables
 
@@ -72,6 +97,7 @@ save('quad_copter_models.mat',                                      ...
      'integrator', 'integrator_dt', 'Ro', 'OuterLoop_Hinf',  ...
      'InnerLoop_Hinf_dt', 'OuterLoop_Hinf_dt', ...
      'PIDControllerClass_dt', 'PDControllerClass_dt', ...
-     'mk_2nd_order'                                                 ...
+     'PitchTestSequence', ...
+    'mk_2nd_order', 'bode_no_phase' ...
      ); 
  

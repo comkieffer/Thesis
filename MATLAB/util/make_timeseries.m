@@ -13,6 +13,11 @@
 %   signals is a matrix of signals. Each signal should be one column of the
 %   matrix. 
 %
+% TODO: improve me !!
+%   use array of string as 'signals' parameter and load them from the parent
+%   workspace. 
+%   add support for extra fields (kwargs style)
+%
 function ts = make_timeseries(time, signals)
     ts.time = time;
     ts.signals.values = signals;

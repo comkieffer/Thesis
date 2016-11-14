@@ -16,9 +16,11 @@ MATLAB/*.html
 # Ignore sublime text workspace files 
 *.sublime-workspace
 
-# Temporarily ignore ICT project, Other resources folder
+# Temporarily ignore ICT project, Other resources folder and Demos folder
 MATLAB/Progetto ICT VRFT/*
 Other Resources/*
+MATLAB/demos/*
+diary/aboutwilson/*
 
 # Ignore the pelican dev-server pid file
 srv.pid
@@ -60,3 +62,6 @@ pelican.pid
 *.nav
 *.snm
 *.vrb
+
+# Temp: 
+illustrations/*

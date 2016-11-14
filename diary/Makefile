@@ -8,7 +8,7 @@ OUTPUTDIR=$(BASEDIR)/output
 CONFFILE=$(BASEDIR)/pelicanconf.py
 PUBLISHCONF=$(BASEDIR)/publishconf.py
 
-SSH_HOST=kimsufi
+SSH_HOST=hetziweb
 SSH_TARGET_DIR=/var/www/thesis.comkieffer.com
 
 GITHUB_PAGES_BRANCH=gh-pages
