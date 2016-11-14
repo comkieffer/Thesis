@@ -135,6 +135,8 @@ def convert_equations(soup):
 
     # Equations will only be contained in comment lines. To extract them we discard all non-comment 
     # lines and trim whitespace. 
+    # However if you have a piece of latex code in, say, a legend and happen to comment that line 
+    # out the tool will detect more latex equations than source equations and will fail.
     code_lines = [l.strip() for l in ml_source.split('\n')]
     comment_lines = [l for l in code_lines if len(l) > 0 and l[0] == '%']
 
@@ -167,6 +169,8 @@ def convert_equations(soup):
         logging.debug('Equations identified in input file: ')
         for eq in equations:
             print('  => ', eq)
+
+        return
 
 
     # We have the same number of equations and images ! We can replace them all !

@@ -3,7 +3,7 @@ Making sense of the data
 
 :date: 2016-08-04
 
-I have new information on the data ! The input signal :math:`u` is more than just a percentage. It is the difference in throttle between the front and the right motor expressed in percentages. 
+I have new information on the data ! The input signal :math:`u` is more than just a percentage. It is the difference in throttle between the front and the rear motor expressed in percentages. 
 
 Written simply it is:
     

@@ -1,0 +1,16 @@
+A NU START
+==========
+
+:date: 2016-09-12
+
+After the despair and depression of the past week it's time to take a step back and be smart. 
+
+I've shelved all of the previous noise work for the moment and started looking a the new scaled data I've received to see if this way I can make things work. I've lowered the bandwidth of the system significantly to ensure that I have something simple to work with. 
+
+The new ``mlx`` file for this is `inner_vrft_new_data <{filename}static/09-12/inner_vrft_new_data.html>`_. It works Ok so far. 
+
+Now we need to start looking at the noise again. This part will suck. 
+
+Actually, it looks pretty good ! Check it `out <{filename}static/09-12/inner_vrft_tune_k_tau.html>`_. It seems that the best performance is when :math:`\tau = 0` but that doesn't seem right. 
+
+Now I just need a way to decide on which is the best. Time to ask for advice. Should I be resting for error in the step response ? In the bode plot ? Something else ? 

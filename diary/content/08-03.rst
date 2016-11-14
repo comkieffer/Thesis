@@ -26,10 +26,11 @@ The performance is very impressive. With a simple second order system I can impo
 When the real data becomes available this might change however. The other thing to consider is that the performance limits of the system are driven by the upper limits on the motor torques. This will impose a hard cap on the achievable performance.
 
 As usual, here are the links to the ``mlx`` files implementing this work: 
+
 * `Inner VRFT <{filename}static/08-03/inner_vrft_mlx.html>`_
 * `Outer VRFT <{filename}static/08-03/outer_vrft_mlx.html>`_
   
 I've also decided that I should link my daily work to specific git  revisions so that I can retrieve the source files If I need to at a later time. 
 
-Today's git revision is #TODO.
+Today's git revision is `#468dfc6 <https://github.com/comkieffer/Thesis/tree/468dfc6790ff728a9f61a70b5914c3423ee48060>`_.
 
