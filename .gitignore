@@ -63,5 +63,6 @@ pelican.pid
 *.snm
 *.vrb
 
-# Temp: 
-illustrations/*
+# Hide generated illustions: 
+Illustrations/*.png
+Illustrations/*.pdf
