@@ -2,13 +2,33 @@
 	"folders":
 	[
 		{
+            "path": "Diary/content",
+            "name": "Diary"
+        }, {
+            "path": "Latex",
+            "name": "Thesis",
+
+            "file_exclude_patterns": [
+                "*.synctex.gz", "*.aux", "*.fls", "*.log"
+            ]
+        }, {
 			"path": ".",
+            "name": "Everything",
+            
             "folder_exclude_patterns": [
-                "diary/pelican/aboutwilson/",
-                "diary/pelican/output/",
-                "diary/pelican/plugins/",
-                "diary/__pycache__"
+                "Diary/pelican/aboutwilson/",
+                "Diary/pelican/output/",
+                "Diary/pelican/plugins/",
+                "Diary/__pycache__"
+            ],
+
+            "file_exclude_patterns": [
+                "*.synctex.gz", "*.aux", "*.fls"
             ]
 		}
-	],
+	], 
+
+    "options": {
+        "root": "Latex/main.tex"
+    }
 }
