@@ -1,6 +1,14 @@
 
 
 function startup() 
+    % This is the main entry point. 
+    %
+    % We want to look for subidrectories that contain script files and print
+    % a list of directories and the files they provide. The list of extensions
+    % we search for are contained in the |MATLAB_EXTENSIONS| and
+    % |SIMULINK_EXTENSIONS| variables. The list is by no means exhaustive.
+    % Feel free to add to it.
+
     % Start by detecting the presence or absence of a global startup file. If the file exists we run
     % it before doing anything else.
     root_startup = userpath();
@@ -73,9 +81,18 @@ function startup()
 
     % Actually add all the folders to the path
     addpath(new_paths);
+    
+    
+    
+    % disable warnings that pop up in the compiled parts of VRFT toolbox
+    % that we can't bloody well change
+    % warning('off', 'Ident:estimation:invalidFocusOption2');
 end
 
 function short_path = shorten_path(abs_path, max_path_len)
+    % Shorten the path so that it is less than max_path_len but still print
+    % the entire filename and extension. 
+    
     if ~exist('max_path_len', 'var') max_path_len = 80; end
 
     if length(abs_path) > max_path_len 
@@ -99,6 +116,8 @@ function joined_str = join_cells(str, joiner)
 end
 
 function wrapped_str = wrap_string(str, indent)
+    % Wrap the string to the width of the command window
+    
     if ~exist('indent', 'var'); indent = ''; end
             
     items = strsplit(str);
