@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="{{ DEFAUL_LANG }}">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" 
+          content="{% block description %}{% endblock %}">
+    <meta name="author" content="{{ AUTHOR }}">
+
+    <title>{% block title %}{{ SITENAME }}{% endblock %}</title>
+
+    <!-- Bootstrap Core CSS, Code Highlighting -->
+    <link href="{{ SITEURL }}/theme/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ SITEURL }}/theme/css/pygments.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ SITEURL }}/theme/css/theme.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Condensed" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    {% block head %}
+    {% endblock %}
+</head>
+
+<body>
+
+    <header class="clearfix"> 
+        <section class="row">  	
+            <h1 class="col-lg-8 col-lg-offset-2">
+                <a href="{{ SITEURL }}" class="title-link">{{ SITENAME}}</a>
+                <br>
+                {% if SITESUBTITLE %}
+                    <small class="subtitle"> {{ SITESUBTITLE }}</small>
+                {% endif %}
+            </h1>
+        </section>
+
+        <section class="row clearfix">
+            <ul class="col-lg-8 col-lg-offset-2 list-unstyled">
+            {% for page in PAGES %}
+                <li class="h5 pull-right">
+                    <a href="{{ SITEURL }}/{{ page.url }}">{{ page.title }}</a>
+                </li>
+            {% endfor %}
+            </ul>
+        </section>
+    </header>
+
+    <!-- Page Content -->
+    <div class="container clearfix">
+
+        <div class="row">
+               
+            <!-- Blog Post Content Column -->
+            <div class="col-lg-8 col-lg-offset-2">
+            {% block content %}
+            {% endblock %}
+            </div>
+                
+        </div><!-- /.row -->
+        
+    </div><!-- /.container -->
+
+    <!-- Footer -->
+    <footer>
+    	<div class="row">
+            <!-- Blog Sidebar Widgets Column -->
+            <div class="col-md-2 col-md-offset-4 col-sm-4 col-sm-offset-2">
+                <ul class="list-unstyled text-right">
+                {% for page in PAGES %}
+                    <li> 
+                        <a href="{{ SITEURL }}/{{ page.url }}">
+                            {{ page.title }}
+                        </a>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+
+            <div class="col-md-2 col-sm-4">
+                <ul class="list-unstyled">
+                    <li>                                 
+                        <a href="{{ FEED_DOMAIN }}/{{ FEED_ALL_ATOM }}" type="application/atom+xml">
+                            <i class="fa-rss"></i>
+                            Atom Posts Feed
+                        </a>
+                    </li>
+                    <li>                                 
+                        <a href="{{ FEED_DOMAIN }}/{{ FEED_ALL_RSS }}" type="application/rss+xml">
+                            <i class="fa-rss"></i>
+                            RSS Posts Feed
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-12">
+                <p class="text-center">
+					Powered by <a href="http://blog.getpelican.com/">Pelican</a> 	
+                </p>               
+            </div>
+        </div>
+        <!-- /.row -->
+    </footer>
+
+
+    <!-- jQuery -->
+    <script src="{{ SITEURL }}/theme/js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{{ SITEURL }}/theme/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

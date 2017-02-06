@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block description %}
+	Title: {{ article.title }}; 
+	Date: {{ article.date|strftime('%Y-%m-%d') }}; 
+	Author: {{ article.author }}
+{% endblock %}
+
+{% block title %}
+	{{ article.title }} — {{ SITENAME }}
+{% endblock %}
+
+{% block content %}
+<article class="post" >
+	<div class="post-header">
+		<h2>{{ article.title }}</h2>
+
+		<time datetime="{{ article.date.isoformat() }}" itemprop="datePublished">{{ article.date|strftime('%d %B %Y') }}</time>
+	</div>
+
+	<div class="post-content">
+		{{ article.content }}
+	</div> 
+
+</article>
+{% endblock %}

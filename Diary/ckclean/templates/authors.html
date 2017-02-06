@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block description %}
+    The Authors page lists all the authors that have contributed to this site and the articles they contributed.
+{% endblock %}
+
+{% block title %}
+    Authors — {{ SITENAME }}
+{% endblock %}
+
+{% block content %}
+{% for author, articles in authors %}
+    <h3>
+        <small>Articles by </small>
+        <a href="{{ SITEURL }}/{{ author.url }}">
+            {{ author | capitalize }}
+        </a>
+    </h3>
+    <table class="table">
+        <tbody>
+        {% for article in articles %}
+            <tr>
+                <td>{{ article.date.strftime("%d %b %Y") }}</td>
+
+                <td>
+                    <a href="{{ SITEURL }}/{{ article.url }}">
+                        {{ article.title }}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endfor %}
+{% endblock %}

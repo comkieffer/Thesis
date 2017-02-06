@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" 
+          content="	Title: Making Progress, Again; 
+	Date: 2016-08-03; 
+	Author: Tibo
+">
+    <meta name="author" content="Tibo">
+
+    <title>	Making Progress, Again — Thesis Log
+</title>
+
+    <!-- Bootstrap Core CSS, Code Highlighting -->
+    <link href="/theme/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/theme/css/theme.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Condensed" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <header class="clearfix"> 
+        <section class="row">  	
+            <h1 class="col-lg-8 col-lg-offset-2">
+                <a href="" class="title-link">Thesis Log</a>
+                <br>
+                    <small class="subtitle"> Keeping myself in check</small>
+            </h1>
+        </section>
+
+        <section class="row clearfix">
+            <ul class="col-lg-8 col-lg-offset-2 list-unstyled">
+                <li class="h5 pull-right">
+                    <a href="/pages/cascade-vrft.html">Cascade VRFT</a>
+                </li>
+                <li class="h5 pull-right">
+                    <a href="/pages/the-vrft-technique.html">The VRFT Technique</a>
+                </li>
+            </ul>
+        </section>
+    </header>
+
+    <!-- Page Content -->
+    <div class="container clearfix">
+
+        <div class="row">
+               
+            <!-- Blog Post Content Column -->
+            <div class="col-lg-8 col-lg-offset-2">
+<article class="post" >
+	<div class="post-header">
+		<h2>Making Progress, Again</h2>
+
+		<time datetime="2016-08-03T00:00:00+02:00" itemprop="datePublished">03 agosto 2016</time>
+	</div>
+
+	<div class="post-content">
+		<p>Full steam ahead !!</p>
+<ol class="arabic simple">
+<li>The inner VRFT works</li>
+<li>The outer VRFT works</li>
+</ol>
+<div class="section" id="inner-vrft">
+<h2>Inner VRFT</h2>
+<p>I'm not sure why the inner vrft works now but clearly it does. I use a second order system as a reference model since the only requirements are on damping and bandwidth. With this I can impose arbitrary bandwidth requirements and the controller seems to be able to follow rather well.</p>
+<p>However, this only works on simulated data. I do not have a set of measured data that I can use yet which makes all these results theoretical: they have no noise and no delays. Once I have experimental data I will have to adjust the code to account for that.</p>
+</div>
+<div class="section" id="outer-vrft">
+<h2>Outer VRFT</h2>
+<p>The outer VRFT works fine too. Previously I was cheating and considering the inner loop as the plant and simply generating <span class="math">\(\dot{q}°\)</span> as a PRBS. I would then simply run <tt class="docutils literal">lsim(integrator * InnerLoop, u, t)</tt> and use that output. With cascade VRFTthis isn't applicable. Since the method is one shot we calculate the reference signal for the outer loop straight from the I/O data we have. This is what I do now.</p>
+<p>The performance is very impressive. With a simple second order system I can impose arbitrary bandwidth requirements and have the controller follow them.</p>
+<p>When the real data becomes available this might change however. The other thing to consider is that the performance limits of the system are driven by the upper limits on the motor torques. This will impose a hard cap on the achievable performance.</p>
+<p>As usual, here are the links to the <tt class="docutils literal">mlx</tt> files implementing this work:</p>
+<ul class="simple">
+<li><a class="reference external" href="/static/08-03/inner_vrft_mlx.html">Inner VRFT</a></li>
+<li><a class="reference external" href="/static/08-03/outer_vrft_mlx.html">Outer VRFT</a></li>
+</ul>
+<p>I've also decided that I should link my daily work to specific git  revisions so that I can retrieve the source files If I need to at a later time.</p>
+<p>Today's git revision is <a class="reference external" href="https://github.com/comkieffer/Thesis/tree/468dfc6790ff728a9f61a70b5914c3423ee48060">#468dfc6</a>.</p>
+</div>
+<script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' }, Macros: {} }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+	</div> 
+
+</article>
+            </div>
+                
+        </div><!-- /.row -->
+        
+    </div><!-- /.container -->
+
+    <!-- Footer -->
+    <footer>
+    	<div class="row">
+            <!-- Blog Sidebar Widgets Column -->
+            <div class="col-md-2 col-md-offset-4 col-sm-4 col-sm-offset-2">
+                <ul class="list-unstyled text-right">
+                    <li> 
+                        <a href="/pages/cascade-vrft.html">
+                            Cascade VRFT
+                        </a>
+                    </li>
+                    <li> 
+                        <a href="/pages/the-vrft-technique.html">
+                            The VRFT Technique
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-2 col-sm-4">
+                <ul class="list-unstyled">
+                    <li>                                 
+                        <a href="/None" type="application/atom+xml">
+                            <i class="fa-rss"></i>
+                            Atom Posts Feed
+                        </a>
+                    </li>
+                    <li>                                 
+                        <a href="/" type="application/rss+xml">
+                            <i class="fa-rss"></i>
+                            RSS Posts Feed
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-12">
+                <p class="text-center">
+					Powered by <a href="http://blog.getpelican.com/">Pelican</a> 	
+                </p>               
+            </div>
+        </div>
+        <!-- /.row -->
+    </footer>
+
+
+    <!-- jQuery -->
+    <script src="/theme/js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/theme/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

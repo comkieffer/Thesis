@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ author }} — {{ SITENAME }}
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    <small>Articles by </small>
+    <a href="{{ SITEURL }}/{{ author.url }}">
+        {{ author | capitalize }}
+    </a>
+</h1>
+<table class="table">
+    <tbody>
+    {% for article in articles %}
+        <tr>
+            <td>{{ article.date.strftime("%d %b %Y") }}</td>
+
+            <td>
+                <a href="{{ SITEURL }}/{{ article.url }}">
+                    {{ article.title }}
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

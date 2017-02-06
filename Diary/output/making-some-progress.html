@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" 
+          content="	Title: Making some progress ?; 
+	Date: 2016-04-26; 
+	Author: Tibo
+">
+    <meta name="author" content="Tibo">
+
+    <title>	Making some progress ? — Thesis Log
+</title>
+
+    <!-- Bootstrap Core CSS, Code Highlighting -->
+    <link href="/theme/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/theme/css/theme.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Condensed" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <header class="clearfix"> 
+        <section class="row">  	
+            <h1 class="col-lg-8 col-lg-offset-2">
+                <a href="" class="title-link">Thesis Log</a>
+                <br>
+                    <small class="subtitle"> Keeping myself in check</small>
+            </h1>
+        </section>
+
+        <section class="row clearfix">
+            <ul class="col-lg-8 col-lg-offset-2 list-unstyled">
+                <li class="h5 pull-right">
+                    <a href="/pages/cascade-vrft.html">Cascade VRFT</a>
+                </li>
+                <li class="h5 pull-right">
+                    <a href="/pages/the-vrft-technique.html">The VRFT Technique</a>
+                </li>
+            </ul>
+        </section>
+    </header>
+
+    <!-- Page Content -->
+    <div class="container clearfix">
+
+        <div class="row">
+               
+            <!-- Blog Post Content Column -->
+            <div class="col-lg-8 col-lg-offset-2">
+<article class="post" >
+	<div class="post-header">
+		<h2>Making some progress ?</h2>
+
+		<time datetime="2016-04-26T00:00:00+02:00" itemprop="datePublished">26 aprile 2016</time>
+	</div>
+
+	<div class="post-content">
+		<p>Very little work this morning. My phone is breaking down and I spent most of my morning looking for replacement parts.</p>
+<p>This afternoon after the usual struggle with MATLAB hogging up to much memory I got to work. Discovered that there doesn't seem to be a documented way of running <tt class="docutils literal">mlx</tt> files from the command window. The usual <tt class="docutils literal">run <span class="pre">script-name</span></tt> doesn't work.</p>
+<p>The objective today is to build a script to compare the results of the MATLAB and Simulink models so that I will know when they match up.</p>
+<p>Discoveries of the day:</p>
+<ol class="arabic simple">
+<li>The controllers in figure 7.1 (p83) are mis-labelled. The outer controller is the PID whilst the inner is the PD. This confirms my gut feeling.</li>
+<li>I still don't know shit.</li>
+</ol>
+<p>Something really weird is going on ... The Pitch Rate plot looks waaaaaay to much like the expected Pitch Angle model. Why ??</p>
+<p>I have no idea.</p>
+<div class="section" id="corrections">
+<h2>Corrections:</h2>
+<p>Looking back on this all my conclusions were wrong. The controllers were not mislabelled but their parameters in the table were. I have no idea what was going on with the plot. Blame it on a forgotten <tt class="docutils literal">clear all</tt>.</p>
+</div>
+
+	</div> 
+
+</article>
+            </div>
+                
+        </div><!-- /.row -->
+        
+    </div><!-- /.container -->
+
+    <!-- Footer -->
+    <footer>
+    	<div class="row">
+            <!-- Blog Sidebar Widgets Column -->
+            <div class="col-md-2 col-md-offset-4 col-sm-4 col-sm-offset-2">
+                <ul class="list-unstyled text-right">
+                    <li> 
+                        <a href="/pages/cascade-vrft.html">
+                            Cascade VRFT
+                        </a>
+                    </li>
+                    <li> 
+                        <a href="/pages/the-vrft-technique.html">
+                            The VRFT Technique
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-2 col-sm-4">
+                <ul class="list-unstyled">
+                    <li>                                 
+                        <a href="/None" type="application/atom+xml">
+                            <i class="fa-rss"></i>
+                            Atom Posts Feed
+                        </a>
+                    </li>
+                    <li>                                 
+                        <a href="/" type="application/rss+xml">
+                            <i class="fa-rss"></i>
+                            RSS Posts Feed
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-12">
+                <p class="text-center">
+					Powered by <a href="http://blog.getpelican.com/">Pelican</a> 	
+                </p>               
+            </div>
+        </div>
+        <!-- /.row -->
+    </footer>
+
+
+    <!-- jQuery -->
+    <script src="/theme/js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/theme/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

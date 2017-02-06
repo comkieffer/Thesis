@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" 
+          content="	Title: A New Beginning; 
+	Date: 2016-04-11; 
+	Author: Tibo
+">
+    <meta name="author" content="Tibo">
+
+    <title>	A New Beginning — Thesis Log
+</title>
+
+    <!-- Bootstrap Core CSS, Code Highlighting -->
+    <link href="/theme/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/theme/css/theme.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Condensed" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <header class="clearfix"> 
+        <section class="row">  	
+            <h1 class="col-lg-8 col-lg-offset-2">
+                <a href="" class="title-link">Thesis Log</a>
+                <br>
+                    <small class="subtitle"> Keeping myself in check</small>
+            </h1>
+        </section>
+
+        <section class="row clearfix">
+            <ul class="col-lg-8 col-lg-offset-2 list-unstyled">
+                <li class="h5 pull-right">
+                    <a href="/pages/cascade-vrft.html">Cascade VRFT</a>
+                </li>
+                <li class="h5 pull-right">
+                    <a href="/pages/the-vrft-technique.html">The VRFT Technique</a>
+                </li>
+            </ul>
+        </section>
+    </header>
+
+    <!-- Page Content -->
+    <div class="container clearfix">
+
+        <div class="row">
+               
+            <!-- Blog Post Content Column -->
+            <div class="col-lg-8 col-lg-offset-2">
+<article class="post" >
+	<div class="post-header">
+		<h2>A New Beginning</h2>
+
+		<time datetime="2016-04-11T00:00:00+02:00" itemprop="datePublished">11 aprile 2016</time>
+	</div>
+
+	<div class="post-content">
+		<p>I met with my advisor today. He changed the thesis subject slightly to account for work done in his lab since I started this project. I'm now working on a different quad-copter.</p>
+<div class="section" id="back-to-basics">
+<h2>Back to basics</h2>
+<p>One thing I need to investigate is how to extract the parameter vector from the output of the <tt class="docutils literal">VRFT1_dy</tt> function.</p>
+<p>The VRFT method requires that the controller be of the form:</p>
+<div class="math">
+\begin{equation*}
+C(z; \theta) = \beta(z)^T\theta^T
+\end{equation*}
+</div>
+<p>Where:</p>
+<ul class="simple">
+<li><span class="math">\(\beta = [\beta_1(z), \beta_2(z), ..., \beta_n(z)]^T\)</span> is a vector of linear transfer functions</li>
+<li><span class="math">\(\theta = [\theta_1, \theta_2, ... \theta_n]^T\)</span> is the vector of parameters</li>
+</ul>
+<p>This requirement is spelled out by the main vrft paper itself:</p>
+<blockquote>
+Attention is restricted to controllers which linearly depend on the parameter vector, namely the controller class <span class="math">\(\left \{ C(z;\ \theta) \right \}\)</span> takes the form <span class="math">\(C(z;\ \theta) = \beta^T(z)\theta\)</span>, where <span class="math">\(\beta = [\beta_1(z), \beta_2(z), ..., \beta_n(z)]^T\)</span> is a known vector of linear discrete time transfer functions and <span class="math">\(\theta = [\theta_1, \theta_2, ... \theta_n]^T\)</span> is the n-dimensional vector of parameters.</blockquote>
+<p>Practically this means that the transfer function of the controller should be written:</p>
+<div class="math">
+\begin{equation*}
+C(z; \theta) = C_1(z) \theta_1 + C_2(z) \theta_2 + ... + C_n(z) \theta
+\end{equation*}
+</div>
+<p>The main vrft paper uses the following controller:</p>
+<div class="math">
+\begin{equation*}
+C(z; \theta) = \frac{\theta_0 + z^{-1} \theta_1 + z^{-2} \theta_2 + z^{-3} \theta_3 + z^{-4} \theta_4 + z^{-5} \theta_5}{1 - z^{-1}}
+\end{equation*}
+</div>
+<p>This system can be re-written in two mathematically equivalent forms that however have a different meaning in a control system sense:</p>
+<div class="math">
+\begin{equation*}
+\begin{aligned}
+    C^{(1)}(z; \theta) &amp;= \frac{1}{1 - z^{-1}} \cdot \sum_i \theta_i z^{-i} \\
+    C^{(2)}(z; \theta) &amp;= \sum_i \frac{\theta_i z^{-i}}{1 - z^{-1}}
+\end{aligned}
+\end{equation*}
+</div>
+<p>One has one state whereas the other has n states. As the implementer of the control system how am I supposed to deduce the intent of the system designer and, in practice, what does it change for me ? The 2 control systems should be identical or at least equivalent.</p>
+<p>This becomes an issue because it means that MATLAB does not always produce the expected output. In the above case one would expect the output to have the same structure as the basic controller however because of the way MATLAB does the calculations the result is</p>
+<div class="math">
+\begin{equation*}
+C(z) = \frac{a_0 + a_1 z^{-1} + ... + a_n z^{-n}}{\left( 1 - z^{-1} \right)^6}
+\end{equation*}
+</div>
+<p>This makes it harder to extract the values of the parameter vector. Maybe running the generated controller through <tt class="docutils literal">minreal</tt> can fix this.</p>
+<div class="section" id="extracting-the-parameter-vector">
+<h3>Extracting the parameter vector</h3>
+<p>Reading through the small bits of code that are not p-code it appears that 2 of the outputs of the <tt class="docutils literal">vrft_engine</tt> can be used to build the parameter vector:</p>
+<pre class="code MATLAB literal-block">
+<span class="p">[</span><span class="n">Cr</span><span class="p">,</span> <span class="n">Cy</span><span class="p">,</span> <span class="n">An</span><span class="p">,</span> <span class="n">Fn</span><span class="p">]</span> <span class="p">=</span> <span class="n">vrft_engine</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">M</span><span class="p">,[],</span><span class="n">B</span><span class="p">,[],</span><span class="n">L</span><span class="p">,[],</span><span class="n">k</span><span class="p">,</span><span class="s">'n'</span><span class="p">);</span>
+</pre>
+<p>Where <tt class="docutils literal">Cr</tt> is the controller from <tt class="docutils literal">r</tt> to <tt class="docutils literal">y</tt> and <tt class="docutils literal">Cy</tt> is the controller from <tt class="docutils literal">d</tt> to <tt class="docutils literal">y</tt>. <tt class="docutils literal">VRFT1_ry</tt> returns <tt class="docutils literal">Cr</tt> and <tt class="docutils literal">VRFT1_dy</tt> returns <tt class="docutils literal">Cy</tt>. <tt class="docutils literal">An</tt> and <tt class="docutils literal">Fn</tt> however are not documented anywhere.</p>
+<p>Some code uses them as such:</p>
+<pre class="code MATLAB literal-block">
+<span class="n">teta_vector</span> <span class="p">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">An</span><span class="p">)</span><span class="o">*</span><span class="n">Fn</span><span class="p">;</span>
+<span class="n">C</span> <span class="p">=</span> <span class="n">minreal</span><span class="p">(</span><span class="n">teta_vector</span><span class="o">'</span> <span class="o">*</span> <span class="n">B</span><span class="p">);</span>
+</pre>
+<p>This snippet is used as part of <tt class="docutils literal">VRFT1_ry_ru</tt> where it used to build a controller that blends reference models on <tt class="docutils literal">r</tt> to <tt class="docutils literal">y</tt> and <tt class="docutils literal">r</tt> to <tt class="docutils literal">u</tt>. Experimentally <tt class="docutils literal">teta_vector</tt> matches the values we calculate by hand from the <tt class="docutils literal">OptimalController</tt>. I created a new function <tt class="docutils literal">VRFT1_dy_theta</tt> that adds <tt class="docutils literal">teta_vector</tt> to its outputs.</p>
+</div>
+<div class="section" id="trying-to-convert-from-one-model-to-the-other">
+<h3>Trying to convert from one model to the other</h3>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">OptimalController</span>
+
+<span class="n">OptimalController</span> <span class="p">=</span>
+
+
+  <span class="mf">0.1463</span> <span class="o">-</span> <span class="mf">0.947</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">2.787</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">5.057</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">3</span> <span class="o">+</span> <span class="mf">6.521</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">4</span> <span class="o">-</span> <span class="mf">6.451</span> <span class="n">z</span>^
+
+          <span class="o">-</span><span class="mi">5</span> <span class="o">+</span> <span class="mf">4.928</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">6</span> <span class="o">-</span> <span class="mf">2.721</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">7</span> <span class="o">+</span> <span class="mf">0.9536</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">8</span> <span class="o">-</span> <span class="mf">0.165</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">9</span> <span class="o">+</span> <span class="mf">0.00518</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">10</span>
+
+  <span class="o">-------------------------------------------------------------------------------</span>
+
+             <span class="mi">1</span> <span class="o">-</span> <span class="mi">6</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">15</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">20</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">15</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">4</span> <span class="o">-</span> <span class="mi">6</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">5</span> <span class="o">+</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">6</span>
+
+
+<span class="n">Sample</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.05</span> <span class="n">seconds</span>
+<span class="n">Discrete</span><span class="o">-</span><span class="n">time</span> <span class="n">transfer</span> <span class="k">function</span><span class="p">.</span>
+</pre></div>
+<p>First strategy: use <tt class="docutils literal">minreal</tt> to cancel out poles and zeros. Not a Success</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">minreal</span><span class="p">(</span><span class="n">OptimalController</span><span class="p">)</span>
+
+<span class="nb">ans</span> <span class="p">=</span>
+
+
+  <span class="mf">0.1463</span> <span class="o">-</span> <span class="mf">0.947</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">2.787</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">5.057</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">3</span> <span class="o">+</span> <span class="mf">6.521</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">4</span> <span class="o">-</span> <span class="mf">6.451</span> <span class="n">z</span>^
+
+          <span class="o">-</span><span class="mi">5</span> <span class="o">+</span> <span class="mf">4.928</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">6</span> <span class="o">-</span> <span class="mf">2.721</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">7</span> <span class="o">+</span> <span class="mf">0.9536</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">8</span> <span class="o">-</span> <span class="mf">0.165</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">9</span> <span class="o">+</span> <span class="mf">0.00518</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">10</span>
+
+  <span class="o">-------------------------------------------------------------------------------</span>
+
+             <span class="mi">1</span> <span class="o">-</span> <span class="mi">6</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">15</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">20</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">15</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">4</span> <span class="o">-</span> <span class="mi">6</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">5</span> <span class="o">+</span> <span class="n">z</span>^<span class="o">-</span><span class="mi">6</span>
+
+
+<span class="n">Sample</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.05</span> <span class="n">seconds</span>
+<span class="n">Discrete</span><span class="o">-</span><span class="n">time</span> <span class="n">transfer</span> <span class="k">function</span><span class="p">.</span>
+</pre></div>
+<p>We had more success with <tt class="docutils literal">zpk</tt></p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">zpk</span><span class="p">(</span><span class="n">OptimalController</span><span class="p">)</span>
+
+<span class="nb">ans</span> <span class="p">=</span>
+
+
+  <span class="mf">0.14627</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">z</span>^<span class="o">-</span><span class="mi">1</span><span class="p">)</span>^<span class="mi">5</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mf">0.03945</span><span class="n">z</span>^<span class="o">-</span><span class="mi">1</span><span class="p">)(</span><span class="mi">1</span> <span class="o">-</span> <span class="mf">1.603</span><span class="n">z</span>^<span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.9547</span><span class="n">z</span>^<span class="o">-</span><span class="mi">2</span><span class="p">)(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.1676</span><span class="n">z</span>^<span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.9403</span><span class="n">z</span>^<span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+
+  <span class="o">---------------------------------------------------------------------------------------------</span>
+
+                                           <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">z</span>^<span class="o">-</span><span class="mi">1</span><span class="p">)</span>^<span class="mi">6</span>
+
+
+<span class="n">Sample</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.05</span> <span class="n">seconds</span>
+<span class="n">Discrete</span><span class="o">-</span><span class="n">time</span> <span class="n">zero</span><span class="o">/</span><span class="n">pole</span><span class="o">/</span><span class="n">gain</span> <span class="n">model</span><span class="p">.</span>
+</pre></div>
+<p>Here the extra <tt class="docutils literal"><span class="pre">(1-z^-5)</span></tt> introduced by MATLAB is immediately obvious. Unfortunately I don't know how to get rid of it. This means that I still don't know how to make the controller look like the desired controller family.</p>
+</div>
+</div>
+<div class="section" id="taking-a-look-at-the-new-quad-copter-model">
+<h2>Taking a look at the new quad-copter model</h2>
+<p>Good news. I can mode forward. The controller structure is the same: PD on the outer loop, PID on the inner loop. This is a standard for quadcopters but seems like a weird choice, wouldn't a PD be faster than a PID ?</p>
+<div class="math">
+\begin{equation*}
+\begin{aligned}
+    C_i(z) &amp;= K_{Pi} + K_{Ii} \frac{1}{s} + K_{Di} \frac{s}{1 + sT_f} \\
+    C_o(z) &amp;= k_{Po} + K_{Do} \frac{s}{1 + sT_f}
+\end{aligned}
+\end{equation*}
+</div>
+<p>The <span class="math">\(T_f\)</span> term would be hard to fit into the VRFT framework since it introduces a non-linear dependence on the parameter vector. In the cascade vrft paper it is fixed using results from a model based approach. This means I need to ask my prof for a value if I can't find it in the paper.</p>
+</div>
+<div class="section" id="work-done-today">
+<h2>Work done today</h2>
+<p>I met my professor this morning for new guidance and intructions. I spent some time investigating one of the things we discussed (see the first section of this post). I then switched gears to get started on the quad-copter model. I've started a new <tt class="docutils literal">mlx</tt> file to do the work. Most of my time so far has been spent going through the paper looking for values needed to build the models.</p>
+<p>I'm most of the way there. I spent some time looking dM/du but finally found it.</p>
+</div>
+<div class="section" id="open-questions">
+<h2>Open Questions</h2>
+<p>The thesis estimates <span class="math">\(\hat{K}_T\)</span> and derives <span class="math">\(\hat{C}_T\)</span> from that. I calculate <span class="math">\(K_T\)</span> from that. Having the direct measurement of <span class="math">\(K_T\)</span> would be nicer.</p>
+</div>
+<script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' }, Macros: {} }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+	</div> 
+
+</article>
+            </div>
+                
+        </div><!-- /.row -->
+        
+    </div><!-- /.container -->
+
+    <!-- Footer -->
+    <footer>
+    	<div class="row">
+            <!-- Blog Sidebar Widgets Column -->
+            <div class="col-md-2 col-md-offset-4 col-sm-4 col-sm-offset-2">
+                <ul class="list-unstyled text-right">
+                    <li> 
+                        <a href="/pages/cascade-vrft.html">
+                            Cascade VRFT
+                        </a>
+                    </li>
+                    <li> 
+                        <a href="/pages/the-vrft-technique.html">
+                            The VRFT Technique
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-2 col-sm-4">
+                <ul class="list-unstyled">
+                    <li>                                 
+                        <a href="/None" type="application/atom+xml">
+                            <i class="fa-rss"></i>
+                            Atom Posts Feed
+                        </a>
+                    </li>
+                    <li>                                 
+                        <a href="/" type="application/rss+xml">
+                            <i class="fa-rss"></i>
+                            RSS Posts Feed
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-12">
+                <p class="text-center">
+					Powered by <a href="http://blog.getpelican.com/">Pelican</a> 	
+                </p>               
+            </div>
+        </div>
+        <!-- /.row -->
+    </footer>
+
+
+    <!-- jQuery -->
+    <script src="/theme/js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/theme/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

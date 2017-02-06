@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block description %}
+    {{ page.description }}
+{% endblock %}
+
+{% block title %}
+    {{ page.title }} — {{ SITENAME }} 
+{% endblock %}
+
+{% block content %}        
+<article id="content" class="post-content">    
+    {{ page.content }}
+</section>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if articles %}
+    {% for article in articles %}
+
+    <article class="post clearfix"> 
+    	<div class="post-header clearfix">
+	        <a href="{{ SITEURL }}/{{ article.url }}" class="title-link">
+	            <h2>{{ article.title }}</h2> 
+	        </a>
+
+	        <div class="small indent"> 
+	        	-- Published
+	            <time datetime="{{ article.date.isoformat() }}">
+	                {{ article.date|strftime('%d %B %Y') }}
+	            </time>                        
+	        </div>
+	    </div>
+
+        <div class="post-content">
+        {{ article.summary }}
+        </div>
+
+        <div class="pull-right post-continue-link">
+	        ( <a href="{{ article.url }}">
+	        	Continue Reading
+	        </a> )
+        </div>
+    </article>
+
+    {% endfor %}
+{% else %}
+	<h3>No articles found!</h3>
+{% endif %}
+
+{% endblock %}

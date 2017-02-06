@@ -1,0 +1,67 @@
+
+html {
+    font-family: 'Roboto', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Roboto-Condensed', sans-serif !important;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+}
+
+.indent {
+    padding-left: 2em; 
+}
+
+.post-content a {
+    text-decoration: underline; 
+}
+
+.post-content h1, 
+.post-content h2, 
+.post-content h3 {
+    padding-top: 1em; 
+} 
+
+.post .post-header {
+    margin-bottom: 1em; 
+}
+
+.post .post-continue-link, 
+.post .post-continue-link a {
+    color: #777 ;
+}
+
+.figure .caption {
+    margin-left: 2em;
+    margin-right: 2em;
+    font-size: 0.9em; 
+}
+
+header {
+    padding: 2em;
+    padding-bottom: 4em;  
+    font-style: italic;
+}
+
+header .subtitle {
+    padding-left: 2em; 
+}
+
+article.post {
+    padding-bottom: 2em; 
+}
+
+footer {
+    padding: 4em; 
+    color: #777;
+}
+
+footer a { color: #777; }
+
+img { 
+    padding: 1em; 
+}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block description %}
+	The Tags page lists all tags used to classify the posts. Each post has at least one tag helping readers find out easily what they are looking for.
+{% endblock %}
+
+{% block title %}
+	Tags — {{ SITENAME }}
+{% endblock %}
+
+{% block content %}
+{% for tag, articles in tags %}
+	<h3>
+	    <small>Articles in </small>
+	    <a href="{{ SITEURL }}/{{ tag.url }}">
+	        {{ tag | capitalize }}
+	    </a>
+	</h3>
+	<table class="table">
+	    <tbody>
+	    {% for article in articles %}
+	        <tr>
+	            <td>{{ article.date.strftime("%d %b %Y") }}</td>
+
+	            <td>
+	                <a href="{{ SITEURL }}/{{ article.url }}">
+	                    {{ article.title }}
+	                </a>
+	            </td>
+	        </tr>
+	    {% endfor %}
+	    </tbody>
+	</table>	
+{% endfor %}
+{% endblock %}

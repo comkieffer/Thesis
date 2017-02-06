@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" 
+          content="	Title: VRFT Time; 
+	Date: 2016-05-05; 
+	Author: Tibo
+">
+    <meta name="author" content="Tibo">
+
+    <title>	VRFT Time — Thesis Log
+</title>
+
+    <!-- Bootstrap Core CSS, Code Highlighting -->
+    <link href="/theme/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/theme/css/theme.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Condensed" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <header class="clearfix"> 
+        <section class="row">  	
+            <h1 class="col-lg-8 col-lg-offset-2">
+                <a href="" class="title-link">Thesis Log</a>
+                <br>
+                    <small class="subtitle"> Keeping myself in check</small>
+            </h1>
+        </section>
+
+        <section class="row clearfix">
+            <ul class="col-lg-8 col-lg-offset-2 list-unstyled">
+                <li class="h5 pull-right">
+                    <a href="/pages/cascade-vrft.html">Cascade VRFT</a>
+                </li>
+                <li class="h5 pull-right">
+                    <a href="/pages/the-vrft-technique.html">The VRFT Technique</a>
+                </li>
+            </ul>
+        </section>
+    </header>
+
+    <!-- Page Content -->
+    <div class="container clearfix">
+
+        <div class="row">
+               
+            <!-- Blog Post Content Column -->
+            <div class="col-lg-8 col-lg-offset-2">
+<article class="post" >
+	<div class="post-header">
+		<h2>VRFT Time</h2>
+
+		<time datetime="2016-05-05T00:00:00+02:00" itemprop="datePublished">05 maggio 2016</time>
+	</div>
+
+	<div class="post-content">
+		<p>Today I need to figure out why the VRFT controller is sooo fucked up ...</p>
+<div class="section" id="expanding-a-pid">
+<h2>Expanding a PID</h2>
+<div class="math">
+\begin{equation*}
+\begin{aligned}
+    G(s) &amp;= K_p + K_i \frac{1}{s} + \frac{K_ds}{1 + sT_f} \\
+         &amp;= \frac{K_p s + K_i}{s} + \frac{K_d s}{1 + sT_f} \\
+         &amp;= \frac{k_p s (1 + s T_f) + K_i (1 + s T_f) + Kd s^2}{s (1 + s T_f)} \\
+         &amp;= \frac{k_p  s + K_p T_f s^2 + K_i + K_i T_f s + K_d s^2}{s^2 T_f + s} \\
+         &amp;= \frac{(K_p T_f + K_d) s^2 + (K_p + K_i T_f) s + K_i}{s^2 T_f + s}
+\end{aligned}
+\end{equation*}
+</div>
+</div>
+<div class="section" id="expanding-a-discrete-time-pid">
+<h2>Expanding a discrete time PID</h2>
+<div class="math">
+\begin{equation*}
+\begin{aligned}
+    G(s) &amp;= k_p + K_i \frac{T_s}{z - 1} + K_d \frac{1}{T_f + \frac{T_s}{z - 1}} \\
+         &amp;= k_p + K_i \frac{T_s}{z - 1} + K_d \frac{1}{T_f + \frac{T_s}{z - 1}} \\
+         &amp;= \frac{K_p (z - 1) + K_i T_s}{z - 1} + K_d \frac{z - 1}{T_f (z - 1) + T_s} \\
+         &amp;= \frac{\left( K_p z - K_p + K_i T_s \right) \left( T_f (z - 1) + T_s \right)
+                  + K_d (z - 1)^2}{(z - 1) \left( T_f (z - 1) + T_s\right)} \\
+         &amp;= \frac{(K_p T_f z^2 - K_p T_f z + K_p T_s z) (-K_p T_f z + K_p T_f - K_p T_s)
+                  (K_i T_s T_f z - K_i T_s T_f + K_i T_s^2)(K_d z^2 - 2 K_d z + K_d)}
+                 {T_f z^2 +(T_s - 2 T_F) z + (T_f - T_s)} \\
+         &amp;= \frac{(K_p T_f + K_d) z^2 +
+                  (-2 K_p T_f + K_p T_s + K_i T_s T_f - 2 K_d) z +
+                  (K_p T_f - K_p T_s - K_i T_s T_f + K_i T_s ^2 +K_d)}
+                 {T_f z^2 + (T_s - 2 T_f) z + (T_f - T_s)}
+\end{aligned}
+\end{equation*}
+</div>
+<p>We can isolate the different terms of the equation such that:</p>
+<div class="math">
+\begin{equation*}
+G(s) = \frac{a_2 z^2 + a_1 z + a_0}{b_2 z^2 + b_1 z + b_0}
+\end{equation*}
+</div>
+<p>Comparing the two equations we have:</p>
+<div class="math">
+\begin{equation*}
+\begin{aligned}
+    a_2 &amp;= K_p T_f + K_d \\
+    a_1 &amp;= -2 K_p T_f + K_p T_s + K_i T_s T_f - 2 K_d \\
+    a_0 &amp;= K_p T_f - K_p T_s - K_i T_s T_f + K_i T_s ^2 +K_d \\
+    b_2 &amp;= T_f \\
+    b_1 &amp;= T_s - 2 T_f \\
+    b_0 &amp;= T_f - T_s
+\end{aligned}
+\end{equation*}
+</div>
+<p>In the case where <span class="math">\(T_f = T_s = T\)</span> the equations reduce to:</p>
+<div class="math">
+\begin{equation*}
+\begin{aligned}
+    a_2 &amp;= K_p T_f + K_d \\
+    a_1 &amp;= - K_p T + K_i T^2 - 2 K_d \\
+    a_0 &amp;= K_d \\
+    b_2 &amp;= T \\
+    b_1 &amp;= - T \\
+    b_0 &amp;= 0
+\end{aligned}
+\end{equation*}
+</div>
+<p>This provides a hint as to why the controller obtained through VRFT has a correct denominator. The denominator is not affected by the PID parameters but by the fixed time constant and sampling interval.</p>
+<p>If only I knew why. Compare the <tt class="docutils literal">OptimalInnerController</tt>, the PID produced by the VRFT method and the original PID controller:</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">tf</span><span class="p">(</span><span class="n">c2d</span><span class="p">(</span><span class="n">Ri</span><span class="p">,</span> <span class="n">Ts</span><span class="p">))</span>
+
+<span class="nb">ans</span> <span class="p">=</span>
+
+  <span class="mf">0.562</span> <span class="n">z</span>^<span class="mi">2</span> <span class="o">-</span> <span class="mf">1.076</span> <span class="n">z</span> <span class="o">+</span> <span class="mf">0.5245</span>
+  <span class="o">----------------------------</span>
+     <span class="n">z</span>^<span class="mi">2</span> <span class="o">-</span> <span class="mf">1.368</span> <span class="n">z</span> <span class="o">+</span> <span class="mf">0.3679</span>
+
+<span class="n">Sample</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.01</span> <span class="n">seconds</span>
+<span class="n">Discrete</span><span class="o">-</span><span class="n">time</span> <span class="n">transfer</span> <span class="k">function</span><span class="p">.</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">tf</span><span class="p">(</span><span class="n">OptimalInnerController</span><span class="p">)</span>
+
+<span class="nb">ans</span> <span class="p">=</span>
+
+  <span class="mf">24.02</span> <span class="n">z</span>^<span class="mi">2</span> <span class="o">-</span> <span class="mf">44.3</span> <span class="n">z</span> <span class="o">+</span> <span class="mf">20.94</span>
+  <span class="o">--------------------------</span>
+    <span class="n">z</span>^<span class="mi">2</span> <span class="o">-</span> <span class="mf">1.368</span> <span class="n">z</span> <span class="o">+</span> <span class="mf">0.3679</span>
+
+<span class="n">Sample</span> <span class="n">time</span><span class="p">:</span> <span class="mf">0.01</span> <span class="n">seconds</span>
+<span class="n">Discrete</span><span class="o">-</span><span class="n">time</span> <span class="n">transfer</span> <span class="k">function</span><span class="p">.</span>
+</pre></div>
+<p>For reference purposes we compare a discretised continuous time PID with an actual discrete time PID:</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">tf</span><span class="p">(</span><span class="n">c2d</span><span class="p">(</span><span class="n">pid</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="nb">ans</span> <span class="p">=</span>
+
+   <span class="mi">2</span> <span class="n">z</span>^<span class="mi">2</span> <span class="o">-</span> <span class="mf">2.368</span> <span class="n">z</span> <span class="o">+</span> <span class="mi">1</span>
+  <span class="o">----------------------</span>
+  <span class="n">z</span>^<span class="mi">2</span> <span class="o">-</span> <span class="mf">1.368</span> <span class="n">z</span> <span class="o">+</span> <span class="mf">0.3679</span>
+
+<span class="n">Sample</span> <span class="n">time</span><span class="p">:</span> <span class="mi">1</span> <span class="n">seconds</span>
+<span class="n">Discrete</span><span class="o">-</span><span class="n">time</span> <span class="n">transfer</span> <span class="k">function</span><span class="p">.</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">tf</span><span class="p">(</span><span class="n">pid</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="nb">ans</span> <span class="p">=</span>
+
+  <span class="mi">2</span> <span class="n">z</span>^<span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span> <span class="n">z</span> <span class="o">+</span> <span class="mi">1</span>
+  <span class="o">---------------</span>
+      <span class="n">z</span>^<span class="mi">2</span> <span class="o">-</span> <span class="n">z</span>
+
+<span class="n">Sample</span> <span class="n">time</span><span class="p">:</span> <span class="mi">1</span> <span class="n">seconds</span>
+<span class="n">Discrete</span><span class="o">-</span><span class="n">time</span> <span class="n">transfer</span> <span class="k">function</span><span class="p">.</span>
+</pre></div>
+<p>It is immediately obvious that even though the numerators are slightly different they are similar. The output of the VRFT is completely fucked up.</p>
+<p>Turns out that the root of the issue is that I forgot to take the Mixer into account when trying to run the VRFT. After fixing that everything went swimmingly !</p>
+<p>Next step: the outer controller. Here is where I'm struggling. It just isn't coming out right ... I wasn't able to figure it out today. Tomorrow I'll make a break hopefully.</p>
+</div>
+<script type='text/javascript'>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' }, Macros: {} }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+	</div> 
+
+</article>
+            </div>
+                
+        </div><!-- /.row -->
+        
+    </div><!-- /.container -->
+
+    <!-- Footer -->
+    <footer>
+    	<div class="row">
+            <!-- Blog Sidebar Widgets Column -->
+            <div class="col-md-2 col-md-offset-4 col-sm-4 col-sm-offset-2">
+                <ul class="list-unstyled text-right">
+                    <li> 
+                        <a href="/pages/cascade-vrft.html">
+                            Cascade VRFT
+                        </a>
+                    </li>
+                    <li> 
+                        <a href="/pages/the-vrft-technique.html">
+                            The VRFT Technique
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-2 col-sm-4">
+                <ul class="list-unstyled">
+                    <li>                                 
+                        <a href="/None" type="application/atom+xml">
+                            <i class="fa-rss"></i>
+                            Atom Posts Feed
+                        </a>
+                    </li>
+                    <li>                                 
+                        <a href="/" type="application/rss+xml">
+                            <i class="fa-rss"></i>
+                            RSS Posts Feed
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-12">
+                <p class="text-center">
+					Powered by <a href="http://blog.getpelican.com/">Pelican</a> 	
+                </p>               
+            </div>
+        </div>
+        <!-- /.row -->
+    </footer>
+
+
+    <!-- jQuery -->
+    <script src="/theme/js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/theme/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
