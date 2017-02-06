@@ -80,19 +80,21 @@ function adjust_subplots(upper_axis, lower_axis, opts)
     free_space = upper_pos.y - (lower_pos.y + lower_pos.h); 
     move_amount = (free_space - opts.padding) / 2;
     
+    % If 'tight' is specified we may need to change the y-axis labels to make
+    % them fit
     if opts.tight
         upper_ymin = upper_axis.YLim(1);
         upper_ytick_min = upper_axis.YTick(1);
         
         if upper_ymin == upper_ytick_min
-            upper_axis.YTickLabel{1} = ' ';
+            adjust_yticks(upper_axis);
         end
         
         lower_ymax = lower_axis.YLim(2);
         lower_ytick_max = lower_axis.YTick(end);
         
         if lower_ymax == lower_ytick_max
-            lower_axis.YTickLabel{end} = ' ';
+            adjust_yticks(lower_axis);
         end
         
         move_amount = (free_space - .01) / 2;
@@ -101,4 +103,25 @@ function adjust_subplots(upper_axis, lower_axis, opts)
     upper_axis.Position(2) = upper_axis.Position(2) - move_amount;
     upper_axis.Position(4) = upper_axis.Position(4) + move_amount;
     lower_axis.Position(4) = lower_axis.Position(4) + move_amount;
+end
+
+function adjust_yticks(axis)
+    % If removing the top-most axis label doesn't deprive the graph of
+    % meaning then do it. otherwise we need to rescale it.
+    % 
+    % When we rescale the graph we want to ensure that we have at least
+    % 3 ticks. We also want to palce them at sane intervals. Currently
+    % we use the max, min and mid-point of the YData.
+    if length(axis.YTick) > 3
+        axis.YTickLabel{1} = ' ';
+    else
+        % The axis contains |Line| objects that contain the actual data.
+        % We want the maximum and minimum of all the data points in the
+        % |Line| objects of this axis.
+        upper_bound = max(max(axis.Children.YData));
+        lower_bound = min(min(axis.Children(:).YData));
+        mid_point   = (upper_bound + lower_bound) / 2; 
+
+        axis.YTick = [lower_bound, mid_point, upper_bound];
+    end
 end
