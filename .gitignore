@@ -16,6 +16,11 @@ MATLAB/*.html
 # Ignore the quad-copters mat file since we can regenerate it easily
 MATLAB/quad_copter_models.mat
 
+# Ignore some of the 'Hardware Testing' directories.
+# We don't need the ones with the temporary logs and stuff
+MATLAB/Hardware Testing/Parser/logs/
+MATLAB/Hardware Testing/Parser/parsed_logs/
+
 # Ignore sublime text workspace files 
 *.sublime-workspace
 
