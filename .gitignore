@@ -13,6 +13,9 @@ diary/output
 MATLAB/html/*
 MATLAB/*.html
 
+# Ignore the quad-copters mat file since we can regenerate it easily
+MATLAB/quad_copter_models.mat
+
 # Ignore sublime text workspace files 
 *.sublime-workspace
 
