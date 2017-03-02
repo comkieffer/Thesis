@@ -1,42 +1,52 @@
 
-function process_test_data(test_name, sd_name)
+%
+% Locate the test data on the specified SD Card and move into the dedicated
+% test folder so that it can be processed and converted to a matlab file. 
+%
+% The data file should be at sd_path/test_name
+% 
+
+function process_test_data(test_name, sd_path)
     
+    % ensure that we return to the starting directory on failure. 
+    initial_folder = pwd;
+    cleanup = onCleanup(@() cd(initial_folder));
+
     % ensure that this script is run from the 'Hardware Testing' folder
     folders = regexp(pwd, filesep, 'split');
     if ~strcmp(folders(end), 'Hardware Testing')
         error('This script must be run from the ''Hardware Testing'' folder');
-    end
-
-    initial_folder = pwd; 
+    end 
 
     %% Step 1 - Move the data from the SD to the results directory
     
     % Ensure that the SD card is connected and available
-%     sd_path = fullfile('/media', getenv('USER'), sd_name);
-%     if ~exist(sd_path, 'dir')
-%         error('Unable to locate SD storage at %s', sd_path);
-%     end
-%     
+    if ~exist(sd_path, 'dir')
+        error('Unable to locate SD storage at %s', sd_path);
+    end
+    
     % Try to find the test file on the SD card
-%     sd_data_file = fullfile(sd_path, [test_name '.txt']);
-%     if ~exist(sd_data_file, 'dir')
-%         error('Unable to locate test data file at %s', sd_data_file);
-%     end
+    sd_data_file = fullfile(sd_path, 'test_0.txt');
+    if ~exist(sd_data_file, 'file')
+        error('Unable to locate test data file at %s', sd_data_file);
+    end
     
     [this_folder, ~, ~] = fileparts(which('process_test_data'));
-    sd_data_file = fullfile(this_folder, [test_name '.txt']);
+%     sd_data_file = fullfile(this_folder, [test_name '.txt']);
     
     % Move the data file to the results folder
     % First we find the base folder for our test. This is where we want to put
     % all our data for safe-keeping.
     % Actually, the directory should alread exist ...
     base_folder = fullfile(pwd, 'test_results', test_name);
-    fprintf('Creating working directory for this test in: %s\n', base_folder'); 
-    mkdir_safe(base_folder);
+    fprintf('\nLocating working directory for this test in: %s\n', base_folder'); 
+    if ~exist(base_folder, 'dir')
+        error('Unable to locate base folder %s for test <%s>', base_folder, test_name);
+    end
     
     % The log file will have to be moved into our base folder
     log_file_destination = fullfile(base_folder, [test_name '.txt']);
-    fprintf('Moving test data to %s\n', log_file_destination); 
+    fprintf('\nMoving test data to %s\n', log_file_destination); 
     copyfile(sd_data_file, log_file_destination); 
     
     %% Step 2 - Parse the results
@@ -49,7 +59,7 @@ function process_test_data(test_name, sd_name)
     
     parse_command = sprintf('java -jar "%s" "%s"', ...
        parser_executable, log_file_destination);
-    fprintf('Executing parse command: %s\n', parse_command);
+    fprintf('\nExecuting parse command: %s\n\n', parse_command);
     
     % The binary creates a 'parsed_logs' directory in its own directory and
     % puts the results there. For simplicity let's move there too. 
@@ -67,8 +77,20 @@ function process_test_data(test_name, sd_name)
     cd(parsed_logs_folder);
     matlabify_data(test_name)
     
-    fprintf('Moving generated files into log directory: %s\n', log_folder);
-    movefile(parsed_logs_folder, log_folder, 'f'); 
+    new_data_folder = fullfile(log_folder, 'parsed_logs');
+    fprintf('\nMoving generated files into log directory: %s\n', new_data_folder);
+    if exist(new_data_folder, 'dir') 
+        if yes_no_prompt('Output log folder already exists. Overwrite')
+            rmdir(new_data_folder, 's');
+        else
+            error('Log folder %s for test <%s> already exists.');
+        end
+    end
+        
+    movefile(parsed_logs_folder, new_data_folder, 'f'); 
+    
+    fprintf('\nAdding test folder %s to path\n', new_data_folder);
+    addpath(new_data_folder);
     
     cd(initial_folder);
     
@@ -88,8 +110,8 @@ function matlabify_data(test_name)
 
     disp('Stored Data:');
 
-    try
-        imu_raw_file = strcat(test_name, '-IMU_RAW.txt');
+    imu_raw_file = strcat(test_name, '-IMU_RAW.txt');
+    if exist(imu_raw_file, 'file')
         imu_raw_data = dlmread(imu_raw_file);
 
         imu_raw_acc_x = imu_raw_data(:,1);
@@ -103,18 +125,18 @@ function matlabify_data(test_name)
         imu_raw_mag_z = imu_raw_data(:,9);
         imu_raw_state = imu_raw_data(:,10);
 
-        disp(['IMU_RAW',10,9,...
+        disp([' - IMU_RAW',10,9,...
             '(imu_raw_acc_x, imu_raw_acc_y, imu_raw_acc_z,',10,9,...
             ' imu_raw_gyro_x, imu_raw_gyro_y, imu_raw_gyro_z,',10,9,...
             ' imu_raw_mag_x, imu_raw_mag_y, imu_raw_mag_z,',10,9,...
             ' imu_raw_state)']);
-
-    catch
     end
 
-    try
-        o_attitude_file = strcat(LOG_NAME,'-ON_ATTITUDE.txt');
+    o_attitude_file = strcat(test_name,'-ON_ATTITUDE.txt');
+    
+    if exist(o_attitude_file, 'file') 
         o_attitude_data = dlmread(o_attitude_file);
+        
 
         o_attitude_roll = o_attitude_data(:,1);
         o_attitude_pitch = o_attitude_data(:,2);
@@ -124,15 +146,25 @@ function matlabify_data(test_name)
         o_attitude_r = o_attitude_data(:,6);
         o_attitude_state = o_attitude_data(:,7);
 
-        disp(['ON_ATTITUDE',10,9,...
+        % Correct spurious readings
+%         o_attitude_roll(abs(o_attitude_roll) > 90) =  NaN;
+%         o_attitude_pitch(abs(o_attitude_pitch) > 90) =  NaN;
+%         o_attitude_yaw(abs(o_attitude_yaw) > 90) =  NaN;
+        o_attitude_roll = remove_spurious_measurements(o_attitude_roll, 5);
+        o_attitude_pitch = remove_spurious_measurements(o_attitude_pitch, 5);
+        o_attitude_yaw = remove_spurious_measurements(o_attitude_yaw, 5);
+        o_attitude_p = remove_spurious_measurements(o_attitude_p, 5);
+        o_attitude_q = remove_spurious_measurements(o_attitude_q, 5);
+        o_attitude_r = remove_spurious_measurements(o_attitude_r, 5);
+        
+        disp([' - ON_ATTITUDE',10,9,...
             '(o_attitude_roll, o_attitude_pitch, o_attitude_yaw,',10,9,...
             ' o_attitude_p, o_attitude_q, o_attitude_r,',10,9,...
             ' o_attitude_state)']);
-    catch
     end
 
-    try
-        o_attitude_q_file = strcat(test_name, '-ON_ATTITUDE_QUAT.txt');
+    o_attitude_q_file = strcat(test_name, '-ON_ATTITUDE_QUAT.txt');
+    if exist(o_attitude_q_file, 'file')
         o_attitude_q_data = dlmread(o_attitude_q_file);
 
         o_attitude_q1 = o_attitude_q_data(:,1);
@@ -142,14 +174,14 @@ function matlabify_data(test_name)
         o_attitude_q_bias = o_attitude_q_data(:,5:7);
         o_attitude_q_state = o_attitude_q_data(:,8);
 
-        disp(['ON_ATTITUDE_QUAT',10,9,...
+        disp([' - ON_ATTITUDE_QUAT',10,9,...
             '(o_attitude_q1, o_attitude_q2, o_attitude_q3, o_attitude_q4,',10,9,...
             ' o_attitude_qt_bias, o_attitude_q_state)']);
-    catch
     end
 
-    try
-        o_pos_body_file = strcat(test_name, '-ON_POS_BODY.txt');
+    
+    o_pos_body_file = strcat(test_name, '-ON_POS_BODY.txt');
+    if exist(o_pos_body_file, 'file')
         o_pos_body_data = dlmread(o_pos_body_file);
 
         o_pos_body_x = o_pos_body_data(:,1);
@@ -163,16 +195,15 @@ function matlabify_data(test_name)
         o_pos_body_w_dot = o_pos_body_data(:,9);
         o_pos_body_state = o_pos_body_data(:,10);
 
-        disp(['ON_POS_BODY',10,9,...
+        disp([' - ON_POS_BODY',10,9,...
             '(o_pos_body_x, o_pos_body_u, o_pos_body_u_dot,',10,9,...
             ' o_pos_body_y, o_pos_body_v, o_pos_body_v_dot,',10,9,...
             ' o_pos_body_z, o_pos_body_w, o_pos_body_w_dot,',10,9,...
             ' o_pos_body_state)']);
-    catch
     end
 
-    try
-        o_pos_ned_file = strcat(test_name, '-ON_POS_NED.txt');
+    o_pos_ned_file = strcat(test_name, '-ON_POS_NED.txt');
+    if exist(o_pos_ned_file, 'file')
         o_pos_ned_data = dlmread(o_pos_ned_file);
 
         o_pos_ned_n = o_pos_ned_data(:,1);
@@ -186,40 +217,37 @@ function matlabify_data(test_name)
         o_pos_ned_d_acc = o_pos_ned_data(:,9);
         o_pos_ned_state = o_pos_ned_data(:,10);
 
-        disp(['ON_POS_NED',10,9,...
+        disp([' - ON_POS_NED',10,9,...
             '(o_pos_ned_n, o_pos_ned_n_vel, o_pos_ned_n_acc,',10,9,...
             ' o_pos_ned_e, o_pos_ned_e_vel, o_pos_ned_e_acc,',10,9,...
             ' o_pos_ned_d, o_pos_ned_d_vel, o_pos_ned_d_acc,',10,9,...
             ' o_pos_ned_state)']);
-    catch
     end
 
-    try
-        baro_file = strcat(test_name, '-BARO.txt');
+    baro_file = strcat(test_name, '-BARO.txt');
+    if exist(baro_file, 'file')
         baro_data = dlmread(baro_file);
 
         baro_pressure = baro_data(:,1);
         baro_state = baro_data(:,2);
 
-        disp(['BARO',10,9,...
+        disp([' - BARO',10,9,...
             '(baro_pressure, baro_state)']);
-    catch
     end
 
-    try
-        proxy_file = strcat(test_name, '-PROXY.txt');
+    proxy_file = strcat(test_name, '-PROXY.txt');
+    if exist(proxy_file, 'file')
         proxy_data = dlmread(proxy_file);
 
         proxy_values = proxy_data(:,1:6);
         proxy_state = proxy_data(:,7);
 
-        disp(['PROXY',10,9,...
+        disp([' - PROXY',10,9,...
             '(proxy_values, proxy_state)']);
-    catch
     end
 
-    try
-        gps_file = strcat(test_name, '-GPS.txt');
+    gps_file = strcat(test_name, '-GPS.txt');
+    if exist(gps_file, 'file')
         gps_data = dlmread(gps_file);
 
         gps_fix = gps_data(:,1);
@@ -228,13 +256,13 @@ function matlabify_data(test_name)
         gps_alt = gps_data(:,4);
         gps_state = gps_data(:,5);
 
-        disp(['GPS',10,9,...
+        disp([' - GPS',10,9,...
             '(gps_fix, gps_lat, gps_lon, gps_alt, gps_state)']);
-    catch
     end
 
-    try
-        radio_file = strcat(test_name, '-RADIO.txt');
+    radio_file = strcat(test_name, '-RADIO.txt');
+    
+    if exist(radio_file, 'file')
         radio_data = dlmread(radio_file);
 
         radio_cmd = radio_data(:,1);
@@ -254,18 +282,17 @@ function matlabify_data(test_name)
         radio_r = radio_data(:,15);
         radio_state = radio_data(:,16);
 
-        disp(['RADIO',10,9,...
+        disp([' - RADIO',10,9,...
             '(radio_cmd, radio_mode, radio_fz,',10,9,...
             ' radio_roll, radio_pitch, radio_yaw,',10,9,...
             ' radio_n, radio_e, radio d,',10,9,...
             ' radio_u, radio_v, radio_w,',10,9,...
             ' radio_p, radio_q, radio_r,',10,9,...
             ' radio_state)']);
-    catch
     end
 
-    try
-        mixer_ctr_file = strcat(test_name, '-MIXER.txt');
+    mixer_ctr_file = strcat(test_name, '-MIXER.txt');
+    if exist(mixer_ctr_file, 'file')
         mixer_ctr_data = dlmread(mixer_ctr_file);
 
         mixer_m1 = mixer_ctr_data(:,1);
@@ -278,15 +305,14 @@ function matlabify_data(test_name)
         mixer_s4 = mixer_ctr_data(:,8);
         mixerr_state = mixer_ctr_data(:,9);
 
-        disp(['MIXER',10,9,...
+        disp([' - MIXER',10,9,...
             '(mixer_m1, mixer_m2, mixer_m3, mixer_m4,',10,9,...
             ' mixer_s1, mixer_s2, mixer_s3, mixer_s4,',10,9,...
             ' mixer_state)']);
-    catch
     end
 
-    try
-        flight_ctr_file = strcat(test_name, '-FLIGHT_CTR.txt');
+    flight_ctr_file = strcat(test_name, '-FLIGHT_CTR.txt');
+    if exist(flight_ctr_file, 'file')
         flight_ctr_data = dlmread(flight_ctr_file);
 
         flight_ctr_fx = flight_ctr_data(:,1);
@@ -302,17 +328,16 @@ function matlabify_data(test_name)
         flight_ctr_e_ref = flight_ctr_data(:,11);
         flight_ctr_d_ref = flight_ctr_data(:,12);
         flight_ctr_state = flight_ctr_data(:,13);
-        disp(['FLIGHT_CTR',10,9,...
+        disp([' - FLIGHT_CTR',10,9,...
             '(flight_ctr_fx, flight_ctr_fy, flight_ctr_fz,',10,9,...
             ' flight_ctr_l, flight_ctr_m, flight_ctr_n,',10,9,...
             ' flight_ctr_r_ref, flight_ctr_p_ref, flight_ctr_y_ref,',10,9,...
             ' flight_ctr_n_ref, flight_ctr_e_ref, flight_ctr_d_ref,',10,9,...
             ' flight_ctr_state)']);
-    catch
     end
 
-    try
-        g_attitude_file = strcat(test_name, '-GND_ATTITUDE.txt');
+    g_attitude_file = strcat(test_name, '-GND_ATTITUDE.txt');
+    if exist(g_attitude_file, 'file')
         g_attitude_data = dlmread(g_attitude_file);
 
         g_attitude_roll = g_attitude_data(:,1);
@@ -320,14 +345,13 @@ function matlabify_data(test_name)
         g_attitude_yaw = g_attitude_data(:,3);
         g_attitude_state = g_attitude_data(:,4);
 
-        disp(['GND_ATTITUDE',10,9,...
+        disp([' - GND_ATTITUDE',10,9,...
             '(g_attitude_roll, g_attitude_pitch, g_attitude_yaw,',10,9,...
             ' g_attitude_state)']);
-    catch
     end
 
-    try
-        g_pos_file = strcat(test_name,'-GND_POS.txt');
+    g_pos_file = strcat(test_name,'-GND_POS.txt');
+    if exist(g_pos_file, 'file')
         g_pos_data = dlmread(g_pos_file);
 
         g_pos_n = g_pos_data(:,1);
@@ -341,14 +365,13 @@ function matlabify_data(test_name)
         g_pos_d_acc = g_pos_data(:,9);
         g_pos_state = g_pos_data(:,10);
 
-        disp(['GND_POS',10,9,...
+        disp([' - GND_POS',10,9,...
             '(g_pos_n, g_pos_e, g_pos_d,',10,9,...
             ' g_pos_state)']);
-    catch
     end
 
-    try
-        waypoint_file = strcat(test_name, '-WAYPOINT.txt');
+    waypoint_file = strcat(test_name, '-WAYPOINT.txt');
+    if exist(waypoint_file, 'file')
         waypoint_data = dlmread(waypoint_file);
 
         waypoint_n = waypoint_data(:,1);
@@ -356,14 +379,13 @@ function matlabify_data(test_name)
         waypoint_d = waypoint_data(:,3);
         waypoint_state = waypoint_data(:,4);
 
-        disp(['WAYPOINT',10,9,...
+        disp([' - WAYPOINT',10,9,...
             '(waypoint_n, waypoint_e, waypoint_d,',10,9,...
             ' waypoint_state)']);
-    catch
     end
 
-    try
-        heartbeat_file = strcat(test_name, '-HEARTBEAT.txt');
+    heartbeat_file = strcat(test_name, '-HEARTBEAT.txt');
+    if exist(heartbeat_file)
         heartbeat_data = dlmread(heartbeat_file);
 
         heartbeat_mode = heartbeat_data(:,1);
@@ -372,15 +394,14 @@ function matlabify_data(test_name)
         heartbeat_stick2 = heartbeat_data(:,4);
         heartbeat_state = heartbeat_data(:,5);
 
-        disp(['HEARTBEAT',10,9,...
+        disp([' - HEARTBEAT',10,9,...
             '(heartbeat_mode, heartbeat_cmd,',10,9,...
             ' heartbeat_stick1, heartbeat_stick2,',10,9,...
             ' heartbeat_state)']);
-    catch
     end
 
-    try
-        attitude_ctr_test_file = strcat(test_name, '-ATTITUDE_CTR_TEST.txt');
+    attitude_ctr_test_file = strcat(test_name, '-ATTITUDE_CTR_TEST.txt');
+    if exist(attitude_ctr_test_file, 'file')
         attitude_ctr_test_data = dlmread(attitude_ctr_test_file);
 
         attitude_ctr_test_t = attitude_ctr_test_data(:,1);
@@ -393,17 +414,16 @@ function matlabify_data(test_name)
         attitude_ctr_test_d4 = attitude_ctr_test_data(:,8);
         attitude_ctr_test_state = attitude_ctr_test_data(:,9);
 
-        disp(['ATTITUDE_CTR_TEST',10,9,...
+        disp([' - ATTITUDE_CTR_TEST',10,9,...
             '(attitude_ctr_test_t,',10,9,...
             ' attitude_ctr_test_r, attitude_ctr_test_p, attitude_ctr_test_y,',10,9,...
             ' attitude_ctr_test_d1, attitude_ctr_test_d2,',10,9,...
             ' attitude_ctr_test_d3, attitude_ctr_test_d4,',10,9,...
             ' attitude_ctr_test_state)']);
-    catch
     end
     
-    try
-        internal_sp_file = strcat(test_name, '-INTERNAL_SP.txt');
+    internal_sp_file = strcat(test_name, '-INTERNAL_SP.txt');
+    if exist(internal_sp_file, 'file')
         internal_sp_data = dlmread(internal_sp_file);
 
         internal_sp_p = internal_sp_data(:,1);
@@ -414,14 +434,24 @@ function matlabify_data(test_name)
         internal_sp_w = internal_sp_data(:,6);
         internal_sp_state = internal_sp_data(:,7);
 
-        disp(['INTERNAL_SP',10,9,...
+        disp([' - INTERNAL_SP',10,9,...
             '(internal_sp_p, internal_sp_q, internal_sp_r,',10,9,...
             ' internal_sp_u, internal_sp_v, internal_sp_w,',10,9,...
             ' internal_sp_state)']);
-    catch
     end
-    
-    clear -regexp file$ data$;
-    
+       
+    clear -regexp file$ data$
     save(test_name);
+end
+
+function result = yes_no_prompt(message)
+    s = input([message ' ? (y/n) '], 's');
+    result = strcmp(s, 'y');
+end
+
+function new_data = remove_spurious_measurements(data, cutoff)
+    cutoff_value = std(data)*cutoff;
+    
+    new_data = data; 
+    new_data(abs(data -mean(data)) > cutoff_value) = NaN;
 end

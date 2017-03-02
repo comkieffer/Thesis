@@ -30,8 +30,8 @@ classdef LTemplate < handle
             if iscell(template_string)
                 template_string = strjoin(template_string, '\n');
             end
-            class(template_string)
-            assert(ischar(template_string), fprintf( ...
+            
+            assert(ischar(template_string) || iscellstr(template_string), fprintf( ...
                 'template_string must be a string or a cellarray of strings. Instead it was a <%s>', class(template_string)));
             
             self.root = LCompiler(template_string).compile();

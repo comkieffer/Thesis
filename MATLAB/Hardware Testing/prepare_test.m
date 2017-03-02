@@ -67,7 +67,7 @@ function prepare_test(test_name)
     % TODO: Check this formula
     inner_anti_windup = 0.0;
     if (inner_pid_params(2) ~= 0.0 && inner_pid_params(3) ~= 0.0)
-        inner_anti_windup = inner_pid_params(2) / inner_pid_params(3);
+        inner_anti_windup = sqrt(inner_pid_params(3) / inner_pid_params(2));
     end
     
     fprintf('\nFound existing outer controller parameters: \n');
@@ -98,28 +98,32 @@ function prepare_test(test_name)
         'Kb_q', inner_anti_windup        ...
     );
 
-    template = LTemplate.load('Attitude_quadrotor.cpp.tpl');
+    template = LTemplate.load('templates/Attitude_quadrotor.cpp.tpl');
     code = template.render(parameters);
     
     controller_file = fullfile(test_folder, 'Attitude_quadrotor.cpp');
     fprintf('Writing new controller to %s\n', controller_file);
-    fwrite_safe(controller_file, code);
+    fwrite_safe(controller_file, 'w+', code);
+    
+    modules_file = fullfile('/home/tibo/Programming/r2p-sdk/drones_firmware/Proximity_module/matlab_gen/Attitude_quadrotor_grt_rtw', 'Attitude_quadrotor.cpp');;
+    fprintf('Copying controller file to %s\n', modules_file); 
+    fwrite_safe(modules_file, 'w+', code);
     
     %% Step 3 - Savec the parameters to a file for safekeeping
     
     parameters_file = fullfile(test_folder, 'params.mat');
-    fprintf('Saving test parameters to: %s', parameters_file); 
-    save(parameters_file, parameters);
+    fprintf('Saving test parameters to: %s\n', parameters_file); 
+    save(parameters_file, 'parameters');
     
     %% Step 3 create the script to run 
-    template = LTemplate.load('pitch_test.m.tpl');
+    template = LTemplate.load('templates/pitch_test.m.tpl');
     code = template.render(struct('test_name', test_name));
     
-    script_file = fullfile(test_folder, sprintf('pitch_test_%s', test_name));
+    script_file = fullfile(test_folder, sprintf('pitch_%s.m', test_name));
     fprintf('Writing new ''pitch_test'' script file to %s\n', script_file);
-    fwrite_safe(script_file, code);
+    fwrite_safe(script_file, 'w+', code);
     
-    fprintf('\nTest Ready. After running the test use ''process_test_data'' to process the test data'); 
+    fprintf('\nTest Ready. After running the test use ''process_test_data'' to process the test data\n'); 
 end
 
 function result = yes_no_prompt(message)
@@ -135,13 +139,13 @@ function result = safe_evalin(workspace, var)
     end
 end
 
-function fwrite_safe(filename, contents)
-   [fid, err] = fopen(filename, 'rt');      
+function fwrite_safe(filename, permission, contents)
+   [fid, err] = fopen(filename, permission);      
    if fid < 0 
        error('Unable to open %s. Error: %s\n', filename, err);
    end
    
-   fwrite(contents);
+   fwrite(fid, contents);
    fclose(fid);
 end
 

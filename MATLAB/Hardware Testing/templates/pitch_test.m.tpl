@@ -7,95 +7,133 @@ clearvars
 close all 
 clc
 
-
 %% User interface
-SerialPort = '/dev/ttyS101';
-TestName = 'test_base_1';
-
-global IS_TESTING;
-IS_TESTING = true; 
+SerialPort = '/dev/ttyACM0';
 
 %% Initialization of serial communication
 %Serial parameters and functions
 
-if ~IS_TESTING
-    % Close old serial port if it is still open 
-    try
-        fclose(instrfind);
-    catch
-        disp('Problem using fclose... Opening a serial COM first.');
-    end
-
-    % Open a new serial port 
-    drone_serial = serial(SerialPort, 'BaudRate', 57600, 'DataBits', 8, 'Terminator', 'CR/LF');
-    fopen(drone_serial);
-else
-    drone_serial = 'dummy';
+% Close old serial port if it is still open 
+try
+    fclose(instrfind);
+catch
+    disp('Problem using fclose... Opening a serial COM first.');
 end
 
-calibrate = @(delay) ...
-    send_command(drone_serial, delay, 'Calibrate', 'sim_raspy 99 1 0');
-testmode  = @(delay) ...
-    send_command(drone_serial, delay, 'TestMode', 'sim_raspy 99 2 1');
 
-start_log = @(delay, name, signals) ...
-    send_command(drone_serial, delay, 'Start Log', sprintf('log %s %s', name, signals));
-stop_log  = @(delay) ...
-    send_command(drone_serial, delay, 'Stop Log', 'log stop');
-
-attitude_start = @(delay, base_thrust, p, q, r) ...
-    send_command(drone_serial, delay, 'Start Attitude', sprintf( ...
-        'test_attitude_ctr_test %.4f %.4f %.4f %.4f', base_thrust, p, q, r) ...
-    );
-attitude_stop = @(delay) ...
-    send_command(drone_serial, delay, 'Stop Attitude', 'test_attitude_ctr stop');
-
-attitude_home = @(delay, base_thrust) ...
-    send_command(drone_serial, delay, 'Attitude Home', ...
-        sprintf('test attitude_ctr_test %.4f 0 0 0', base_thrust));
-
-    
-%% Start Test equence
+%% Setup commands
+%
+% These commands will be run before the test starts and take care of
+% configuring the drone, starting the logging and powering the motors
 
 hover_thrust = -10;
 
-% Drone Setup 
-calibrate(1);
-testmode(1); 
-attitude_home(10, hover_thrust); 
+attitude_cmd = @(h, p, q, r) ...
+    sprintf('test attitude_ctr_test %.4f %.4f %.4f %.4f', h, p, q, r);
 
-% Beep - Start test
-start_log(2, 'test', 'o_attitude mixer attitude_ctr_test');
-attitude_start(10, hover_thrust, 0, deg2rad(30), 0);
-attitude_start(10, hover_thrust, 0, -deg2rad(30), 0);
-attitude_home(5, hover_thrust);
-stop_log(2);
+setup_commands = struct([]); 
 
-% Beep - End Test
-attitude_stop(1);
+setup_commands(1).name = 'Calibrate';
+setup_commands(1).command = 'sim_raspy 99 1 0';
+setup_commands(1).duration = 2; 
+
+setup_commands(2).name = 'Enter Test Mode';
+setup_commands(2).command = 'sim_raspy 99 2 1';
+setup_commands(2).duration = 2; 
+
+setup_commands(3).name = 'Power Up Motors';
+setup_commands(3).command = attitude_cmd(hover_thrust, 0, 0, 0);
+setup_commands(3).duration = 5; 
+
+setup_commands(4).name = 'Start Logging';
+setup_commands(4).command = 'log test_0 o_attitude mixer attitude_ctr_test';
+setup_commands(4).duration = 1;
+
+%% Teardown commands
+%
+% These commands will be run after the test finishes and will take care of
+% returning the drone to a safe orientation, stopping the loggind and powering
+% off. 
+
+teardown_commands = struct([]);
+
+teardown_commands(1).name = 'Set Attitude Home';
+teardown_commands(1).command = attitude_cmd(hover_thrust, 0, 0, 0);
+teardown_commands(1).duration = 5;
+
+teardown_commands(2).name = 'Stop Logging';
+teardown_commands(2).command = 'log stop';
+teardown_commands(2).duration = 1;
+
+teardown_commands(3).name = 'Power Down Motors';
+teardown_commands(3).command = 'test attitude_ctr_test stop';
+teardown_commands(3).duration = 1;
+
+%% Test commands
+%
+% This is where the test actually happens
+
+test_commands = struct([]);
+
+test_commands(1).name = 'Set Attitude Home';
+test_commands(1).command = attitude_cmd(hover_thrust, 0, deg2rad(30), 0);
+test_commands(1).duration = 5;
+
+test_commands(2).name = 'Set Attitude Home';
+test_commands(2).command = attitude_cmd(hover_thrust, 0, deg2rad(-30), 0);
+test_commands(2).duration = 5;
+
+%% Run the test
+
+% Open a new serial port 
+drone_serial = serial(SerialPort, 'BaudRate', 57600, 'DataBits', 8, 'Terminator', 'CR/LF');
+fopen(drone_serial);
+
+draw_boxed_text('Setup In Progress'); 
+for k = 1:length(setup_commands)
+    run_command(setup_commands(k))
+end
+
+draw_boxed_text('Running Test');
+for k = 1:length(test_commands)
+    run_command(test_commands(k))
+end
+
+draw_boxed_text('Teardown In Progress');
+for k = 1:length(teardown_commands)
+    run_command(teardown_commands(k))
+end
 
 % Close the serial port
-if ~IS_TESTING
-    fclose(drone_serial);
-end
+fclose(drone_serial);
 
 %% END OF CODE
 
 % Send a command to the drone and print on screen
-function send_command(serial, delay, name, command)
-    global IS_TESTING;
+function run_command(serial_device, command)
+    fprintf('\n[%s] - %13s : %s\n', datestr(now, 'HH:MM:SS.FFF'), ...
+        command.name, command.command);
     
-    fprintf('\n[%s] - %13s : %s\n', datestr(now, 'HH:MM:SS.FFF'), name, command);
+    fprintf(serial_device, command.command);
+    readasync(serial_device)
+
+    waitfor(delay);
     
-    if ~IS_TESTING
-        fprintf(serial, command);
-    end
-    
-    pause_progress(delay);
+    if serial_device.BytesAvailable > 0
+        str = fscanf(serial_device);
+        
+        % remove newlines, extra spaces and other junk
+        str = replace({'\r', '\n' }, ' ', str);
+        str = deblank(str);
+        
+        if ~isempty(str)
+            fprintf('\n  => Serial says; %s\n', );
+        end
+    end        
 end
 
 % Display a pretty progress bar whilst waiting for the time to run out
-function pause_progress(delay)
+function waitfor(delay)
     start_time =  clock();
     
     win_size = matlab.desktop.commandwindow.size;
@@ -118,7 +156,21 @@ function pause_progress(delay)
         end
         
         cpb.setValue(elapsed / delay * 100);
+        pause(.001);
     end
     
+    
     cpb.stop(); 
+end
+
+function draw_boxed_text(text)
+    win_size = matlab.desktop.commandwindow.size;
+    padding = 4;
+    
+    % Assume that window will be big enough
+    box_size = length(text) + 2*padding;
+
+    disp(pad(['#' pad('', box_size, 'both', '=') '#'], win_size(1) - 1, 'both', ' '));
+    disp(pad(['#    ' text '    #'], win_size(1) - 1, 'both', ' '));
+    disp(pad(['#' pad('', box_size, 'both', '=') '#'], win_size(1) - 1, 'both', ' '));    
 end
