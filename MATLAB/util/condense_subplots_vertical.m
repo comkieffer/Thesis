@@ -5,7 +5,7 @@ function condense_subplots_vertical(varargin)
     ip = inputParser(); 
     ip.addRequired('plots'); % @isnumeric
     ip.addOptional('handle', gcf()); % @ishandle 
-    ip.addParameter('padding', .04); % @isnumeric, iscalar
+    ip.addParameter('padding', .02); % @isnumeric, iscalar
     ip.addParameter('tight', true); % @isbool
     ip.addParameter('fixlabels', false); % @isbool
     ip.parse(varargin{:});
@@ -13,7 +13,7 @@ function condense_subplots_vertical(varargin)
     if isempty(ip.Results.plots) 
         return
     end
-        
+       
     % Order the plots by their y coordinate in asscending order (bottom first)
     %
     % In any sane programming launguage the standard library would provide a
@@ -21,7 +21,7 @@ function condense_subplots_vertical(varargin)
     % completely trivial. MATLAB however is anything but a sane language.
     %
     % Maybe there is a saner way of doing this but right now I can't find it. 
-    %
+    %    
     order = arrayfun(@(el) el.Position(2), ip.Results.plots)';
     [~, idx] = sortrows(order);
     plots = ip.Results.plots(idx);     
@@ -37,10 +37,9 @@ function condense_subplots_vertical(varargin)
     
     for k = 1:length(plots)
        this_plot = plots(k);
-       fprintf('Plot %i Initial Pos: [%.2f, %.2f, %.2f, %.2f]\n', k, this_plot.Position);
+%        fprintf('Plot %i Initial Pos: [%.2f, %.2f, %.2f, %.2f]\n', k, this_plot.Position);
        
        if ip.Results.tight && this_plot ~= bottom_plot
-           fprintf(' -- not bottomplot\n');
            this_plot.XTickLabel = {};
            this_plot.XLabel.String = {};
            
@@ -56,7 +55,7 @@ function condense_subplots_vertical(varargin)
             single_plot_height
        ];
    
-       fprintf('Plot %i Final Pos  : [%.2f, %.2f, %.2f, %.2f]\n', k, this_plot.Position);
+%        fprintf('Plot %i Final Pos  : [%.2f, %.2f, %.2f, %.2f]\n', k, this_plot.Position);
 
     end
 end
@@ -73,7 +72,6 @@ function [x1, y1, x2, y2] = make_plot_bounding_box(plots)
     
     for k = 1:length(plots)
         this_plot = plots(k);
-        
         
         x1 = min(this_plot.Position(1), x1);
         y1 = min(this_plot.Position(2), y1);

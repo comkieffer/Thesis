@@ -137,26 +137,14 @@ function matlabify_data(test_name)
     if exist(o_attitude_file, 'file') 
         o_attitude_data = dlmread(o_attitude_file);
         
-
-        o_attitude_roll = o_attitude_data(:,1);
-        o_attitude_pitch = o_attitude_data(:,2);
-        o_attitude_yaw = o_attitude_data(:,3);
-        o_attitude_p = o_attitude_data(:,4);
-        o_attitude_q = o_attitude_data(:,5);
-        o_attitude_r = o_attitude_data(:,6);
+        o_attitude_roll = remove_spurious_measurements(o_attitude_data(:,1), 5);
+        o_attitude_pitch = remove_spurious_measurements(o_attitude_data(:,2), 5);
+        o_attitude_yaw = remove_spurious_measurements(o_attitude_data(:,3), 5);
+        o_attitude_p = remove_spurious_measurements(o_attitude_data(:,4), 5);
+        o_attitude_q = remove_spurious_measurements(o_attitude_data(:,5), 5);
+        o_attitude_r = remove_spurious_measurements(o_attitude_data(:,6), 5);
         o_attitude_state = o_attitude_data(:,7);
 
-        % Correct spurious readings
-%         o_attitude_roll(abs(o_attitude_roll) > 90) =  NaN;
-%         o_attitude_pitch(abs(o_attitude_pitch) > 90) =  NaN;
-%         o_attitude_yaw(abs(o_attitude_yaw) > 90) =  NaN;
-        o_attitude_roll = remove_spurious_measurements(o_attitude_roll, 5);
-        o_attitude_pitch = remove_spurious_measurements(o_attitude_pitch, 5);
-        o_attitude_yaw = remove_spurious_measurements(o_attitude_yaw, 5);
-        o_attitude_p = remove_spurious_measurements(o_attitude_p, 5);
-        o_attitude_q = remove_spurious_measurements(o_attitude_q, 5);
-        o_attitude_r = remove_spurious_measurements(o_attitude_r, 5);
-        
         disp([' - ON_ATTITUDE',10,9,...
             '(o_attitude_roll, o_attitude_pitch, o_attitude_yaw,',10,9,...
             ' o_attitude_p, o_attitude_q, o_attitude_r,',10,9,...
