@@ -93,6 +93,7 @@ function process_test_data(test_name, sd_path)
     addpath(new_data_folder);
     
     cd(initial_folder);
+    make_dashboard(test_name);
     
 end
 

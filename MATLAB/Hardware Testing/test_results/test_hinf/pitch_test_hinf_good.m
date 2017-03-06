@@ -3,7 +3,7 @@
 % Authors:  Mattia Giurato (mattia.giurato@polimi.it)                     %
 % Date: 18/01/2017                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+clearvars
 close all 
 clc
 

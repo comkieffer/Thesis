@@ -89,6 +89,7 @@ function prepare_test(test_name)
     fprintf('Generating Attitude_quadrotor.cpp file ...\n');
     
     parameters = struct( ...
+        'test_name', test_name, ...
         'Kp_pitch', outer_pd_params(1),  ...
         'Ki_pitch', 0.0,                 ...
         'Kd_pitch', outer_pd_params(2),  ...
@@ -122,6 +123,9 @@ function prepare_test(test_name)
     script_file = fullfile(test_folder, sprintf('pitch_%s.m', test_name));
     fprintf('Writing new ''pitch_test'' script file to %s\n', script_file);
     fwrite_safe(script_file, 'w+', code);
+    
+    fprintf('\nAdding %s to MATLAB PATH ...\n', test_folder);
+    addpath(test_folder);
     
     fprintf('\nTest Ready. After running the test use ''process_test_data'' to process the test data\n'); 
 end

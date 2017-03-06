@@ -3,10 +3,9 @@
 % Authors:  Mattia Giurato (mattia.giurato@polimi.it)                     %
 % Date: 18/01/2017                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clearvars
+
 close all 
 clc
-
 
 %% User interface
 SerialPort = '/dev/ttyACM0';
@@ -77,36 +76,37 @@ teardown_commands(3).duration = 1;
 test_commands = struct([]);
 
 test_commands(1).name = 'Set Attitude Home';
-test_commands(1).command = attitude_cmd(hover_thrust, 0, deg2rad(30), 0);
-test_commands(1).duration = 5;
+test_commands(1).command = attitude_cmd(hover_thrust, 0, deg2rad(15), 0);
+test_commands(1).duration = 10;
 
 test_commands(2).name = 'Set Attitude Home';
-test_commands(2).command = attitude_cmd(hover_thrust, 0, deg2rad(-30), 0);
-test_commands(2).duration = 5;
+test_commands(2).command = attitude_cmd(hover_thrust, 0, deg2rad(-15), 0);
+test_commands(2).duration = 10;
 
 %% Run the test
 
 % Open a new serial port 
-% drone_serial = serial(SerialPort, 'BaudRate', 57600, 'DataBits', 8, 'Terminator', 'CR/LF');
-% fopen(drone_serial);
+drone_serial = serial(SerialPort, 'BaudRate', 57600, 'DataBits', 8, 'Terminator', 'CR/LF');
+fopen(drone_serial);
 
 draw_boxed_text('Setup In Progress'); 
 for k = 1:length(setup_commands)
-    run_command(setup_commands(k))
+    run_command(drone_serial, setup_commands(k))
 end
 
 draw_boxed_text('Running Test');
 for k = 1:length(test_commands)
-    run_command(test_commands(k))
+    run_command(drone_serial, test_commands(k))
 end
 
 draw_boxed_text('Teardown In Progress');
 for k = 1:length(teardown_commands)
-    run_command(teardown_commands(k))
+    run_command(drone_serial, teardown_commands(k))
 end
 
 % Close the serial port
-% fclose(drone_serial);
+fclose(drone_serial);
+fprintf('\n');
 
 %% END OF CODE
 
@@ -118,17 +118,21 @@ function run_command(serial_device, command)
     fprintf(serial_device, command.command);
     readasync(serial_device)
 
-    waitfor(delay);
+    waitfor(command.duration);
     
     if serial_device.BytesAvailable > 0
         str = fscanf(serial_device);
         
         % remove newlines, extra spaces and other junk
-        str = replace({'\r', '\n' }, ' ', str);
+        str = replace({char(10), char(13)}, ' ', str); % 10 = CR, 13 = LF
         str = deblank(str);
         
-        if ~isempty(str)
-            fprintf('\n  => Serial says; %s\n', );
+        for k = 1:length(str)
+            line = str{k};
+            
+            if ~isempty(line) && line ~= ' '
+                fprintf('\n  => Serial says: <-%s->\n', str{:});
+            end
         end
     end        
 end
@@ -170,8 +174,9 @@ function draw_boxed_text(text)
     
     % Assume that window will be big enough
     box_size = length(text) + 2*padding;
-
+    fprintf('\n\n');
     disp(pad(['#' pad('', box_size, 'both', '=') '#'], win_size(1) - 1, 'both', ' '));
     disp(pad(['#    ' text '    #'], win_size(1) - 1, 'both', ' '));
     disp(pad(['#' pad('', box_size, 'both', '=') '#'], win_size(1) - 1, 'both', ' '));    
+    fprintf('\n');
 end

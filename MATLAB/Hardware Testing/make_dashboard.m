@@ -14,7 +14,8 @@ function make_dashboard(test_name)
     if isempty(base_data_file)
         error('Unable to locate base data file for <%s>', base_test_name);
     end
-
+    fprintf('Loading base (hinf) test data from: %s\n', base_data_file);
+    
     base_test_data = load(base_data_file); 
     
     % Load the data for this test
@@ -23,6 +24,7 @@ function make_dashboard(test_name)
     if ~exist(test_data_file)
         error('Unable to locate test data file. Expected it at: %s', test_data_file);
     end
+    fprintf('Loading new test data from: %s\n', test_data_file);
     
     new_test_data = load(test_data_file);
     
@@ -30,80 +32,82 @@ function make_dashboard(test_name)
     
     base_data_time_vec = [1:length(base_test_data.o_attitude_roll)] .* .01;
     new_data_time_vec = [1:length(new_test_data.o_attitude_roll)] .* .01; 
-    
-    width = 3; height = 3;
+
+    width = 3; height = 2;
     plot_idx = @(x, y) (x-1) * width + y;
     figure();
         ax11 = subplot(height, width, plot_idx(1, 1));
+            set_point = rad2deg(new_test_data.attitude_ctr_test_r(1:length(new_data_time_vec)));
             plot( ...
                 base_data_time_vec, base_test_data.o_attitude_roll, ... 
                 new_data_time_vec , new_test_data.o_attitude_roll, ...
-                new_data_time_vec, new_test_data.attitude_ctr_test_r, 'g--' ...
+                new_data_time_vec, set_point, 'g--' ...
             ); 
             title('Roll')
             ylabel('Angle (°)');
         ax21 = subplot(height, width, plot_idx(2, 1));
             plot( ...
                 base_data_time_vec, base_test_data.o_attitude_p, '--', ... 
-                new_data_time_vec , new_test_data.o_attitude_p ...
+                new_data_time_vec , new_test_data.o_attitude_p, ...
+                0, 0, 'g--' ...
             ); 
             ylabel('Rate (°/s)');
-            
-        ax31 = subplot(height, width, plot_idx(3, 1));
-            ylabel('Control Effort');
             xlabel('Time (s)');
-%             legend('Base H\infty', 'New VRFT', 'Set Point', 'Location', 'SouthEast');
+            legend('Base H\infty', 'New VRFT', 'Set Point', 'Location', 'SouthEast');
 
         ax12 = subplot(height, width, plot_idx(1, 2));
+            set_point = rad2deg(new_test_data.attitude_ctr_test_p(1:length(new_data_time_vec)));
             plot( ...
                 base_data_time_vec, base_test_data.o_attitude_pitch, ... 
                 new_data_time_vec , new_test_data.o_attitude_pitch, ...
-                new_data_time_vec, new_test_data.attitude_ctr_test_p, 'g--' ...
+                new_data_time_vec, set_point, 'g--' ...
             ); 
             title('Pitch')
-            ylabel('Angle (°)');
+            ylabel('Angle (°)'); 
+            
         ax22 = subplot(height, width, plot_idx(2, 2));
             plot( ...
                 base_data_time_vec, base_test_data.o_attitude_q, '--', ... 
-                new_data_time_vec , new_test_data.o_attitude_q ...
+                new_data_time_vec , new_test_data.o_attitude_q, ...
+                0, 0, 'g--' ...
             ); 
-            ylabel('Rate (°/s)');
-        ax32 = subplot(height, width, plot_idx(3, 2));
-            ylabel('Control Effort');
+            ylabel('Rate (°/s)');            
             xlabel('Time (s)');
-%             legend('Base H\infty', 'New VRFT', 'Set Point', 'Location', 'SouthEast');
-            
+            legend('Base H\infty', 'New VRFT', 'Set Point', 'Location', 'SouthEast');
+
         ax13 = subplot(height, width, plot_idx(1, 3));
+            set_point = rad2deg(new_test_data.attitude_ctr_test_y(1:length(new_data_time_vec)));
             plot( ...
                 base_data_time_vec, base_test_data.o_attitude_yaw, ... 
                 new_data_time_vec , new_test_data.o_attitude_yaw, ...
-                new_data_time_vec, new_test_data.attitude_ctr_test_y, 'g--' ...
+                new_data_time_vec, set_point, 'g--' ...
             ); 
             title('Yaw')
             ylabel('Angle (°)');
         ax23 = subplot(height, width, plot_idx(2, 3));
             plot( ...
                 base_data_time_vec, base_test_data.o_attitude_r, '--', ... 
-                new_data_time_vec , new_test_data.o_attitude_r ...
+                new_data_time_vec , new_test_data.o_attitude_r, ...
+                0, 0, 'g--' ...
             ); 
             ylabel('Rate (°/s)');
-        ax33 = subplot(height, width, plot_idx(3, 3));
-            ylabel('Control Effort');
             xlabel('Time (s)');
-%             legend('Base H\infty', 'New VRFT', 'Set Point', 'Location', 'SouthEast');            
-           
-         
-    condense_subplots_vertical([ax11, ax21, ax31]);
-    condense_subplots_vertical([ax12, ax22, ax32]);
-    condense_subplots_vertical([ax13, ax23, ax33]);
+            legend('Base H\infty', 'New VRFT', 'Set Point', 'Location', 'SouthEast');
+
+            
+    condense_subplots_vertical([ax11, ax21]);
+    condense_subplots_vertical([ax12, ax22]);
+    condense_subplots_vertical([ax13, ax23]);
             
     % Used in the simulink model that we're about to run
     Ts = .01;
     model_theta_sp = [
         (Ts:length(new_test_data.attitude_ctr_test_p)) .* Ts;  
-        new_test_data.attitude_ctr_test_p'
+        rad2deg(new_test_data.attitude_ctr_test_p')
     ]';
+    assignin('base', 'model_theta_sp', model_theta_sp);
 
+    
     simout = sim('model', ...
         'SimulationMode', 'normal', ...
         'SaveState', 'on', ...
@@ -124,8 +128,8 @@ function make_dashboard(test_name)
     figure();
         ax11 = subplot(height, width, plot_idx(1, 1));
             plot(theta_sim.Time, theta_sim.Data, ...
-                 new_data_time_vec , new_test_data.o_attitude_roll, ...
-                 model_theta_sp(1, :), model_theta_sp(2, :), '--' ...
+                 new_data_time_vec , new_test_data.o_attitude_pitch, ...
+                 model_theta_sp(:, 1), model_theta_sp(:, 2), 'g--' ...
             ); 
             title('Comparision of Real & Simulated Signals');
             ylabel('Pitch Angle (°)');

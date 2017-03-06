@@ -2,9 +2,9 @@
  * Attitude_quadrotor.cpp
  * 
  * Test Configuration: 
- *  - Test Name: {{ test_name }}
- *  - Inner Loop: Kp = {{ Kp_pitch }}, Ki = {{ Ki_pitch }}, Kd = {{ Kd_pitch }}
- *  - Outer Loop: Kp = {{ Kp_q }}, Ki = {{ Ki_q }}, Kd = {{ Kd_q }}, Kb = {{ Kb_q }}
+ *  - Test Name: test_i7_o4
+ *  - Inner Loop: Kp = 2.5593, Ki = 0, Kd = 0
+ *  - Outer Loop: Kp = 0.22946, Ki = 0.4783, Kd = 0, Kb = 0
  *
  * Academic License - for use in teaching, academic research, and meeting
  * course requirements at degree granting institutions only.  Not for
@@ -22,6 +22,8 @@
  * Code generation objective: Execution efficiency
  * Validation result: Not run
  */
+
+
 
 #include "Attitude_quadrotor.h"
 #include "Attitude_quadrotor_private.h"
@@ -619,7 +621,7 @@ Attitude_quadrotorModelClass::Attitude_quadrotorModelClass()
     0.40514779629427244,               /* Variable: KB_P
                                         * Referenced by: '<S6>/Kb'
                                         */
-    {{ Kb_q }},                        /* Variable: KB_Q, Orig: 0.40514779629427244
+    0,                        /* Variable: KB_Q, Orig: 0.40514779629427244
                                         * Referenced by: '<S7>/Kb'
                                         */
     0.38746423667787738,               /* Variable: KB_R
@@ -628,10 +630,10 @@ Attitude_quadrotorModelClass::Attitude_quadrotorModelClass()
     0.0499,                            /* Variable: KD_P
                                         * Referenced by: '<S6>/Derivative Gain'
                                         */
-    {{ Kd_pitch }},                    /* Variable: KD_PITCH, Orig: 0.00512
+    0,                    /* Variable: KD_PITCH, Orig: 0.00512
                                         * Referenced by: '<S3>/Derivative Gain'
                                         */
-    {{ Kd_q }},                        /* Variable: KD_Q, Orig: 0.0499
+    0,                        /* Variable: KD_Q, Orig: 0.0499
                                         * Referenced by: '<S7>/Derivative Gain'
                                         */
     0.00584,                           /* Variable: KD_R
@@ -646,10 +648,10 @@ Attitude_quadrotorModelClass::Attitude_quadrotorModelClass()
     0.304,                             /* Variable: KI_P
                                         * Referenced by: '<S6>/Integral Gain'
                                         */
-    {{ Ki_pitch }},                    /* Variable: KI_PITCH, Orig: 0.0
+    0,                    /* Variable: KI_PITCH, Orig: 0.0
                                         * Referenced by: '<S3>/Integral Gain'
                                         */
-    {{ Ki_q }},                        /* Variable: KI_Q, Orig: 0.304
+    0.4783,                        /* Variable: KI_Q, Orig: 0.304
                                         * Referenced by: '<S7>/Integral Gain'
                                         */
     0.0389,                            /* Variable: KI_R
@@ -664,10 +666,10 @@ Attitude_quadrotorModelClass::Attitude_quadrotorModelClass()
     0.298,                             /* Variable: KP_P
                                         * Referenced by: '<S6>/Proportional Gain'
                                         */
-    {{ Kp_pitch }},                    /* Variable: KP_PITCH, Orig: 2.0
+    2.5593,                    /* Variable: KP_PITCH, Orig: 2.0
                                         * Referenced by: '<S3>/Proportional Gain'
                                         */
-    {{ Kp_q }},                        /* Variable: KP_Q:, 0.298
+    0.22946,                        /* Variable: KP_Q:, 0.298
                                         * Referenced by: '<S7>/Proportional Gain'
                                         */
     0.135,                             /* Variable: KP_R

@@ -1,5 +1,10 @@
 /*
  * Attitude_quadrotor.cpp
+ * 
+ * Test Configuration: 
+ *  - Test Name: test_hinf_good
+ *  - Inner Loop: Kp = 2, Ki = 0, Kd = 0.00512
+ *  - Outer Loop: Kp = 0.298, Ki = 0.304, Kd = 0.0499, Kb = 0.40515
  *
  * Academic License - for use in teaching, academic research, and meeting
  * course requirements at degree granting institutions only.  Not for
@@ -17,6 +22,8 @@
  * Code generation objective: Execution efficiency
  * Validation result: Not run
  */
+
+
 
 #include "Attitude_quadrotor.h"
 #include "Attitude_quadrotor_private.h"
