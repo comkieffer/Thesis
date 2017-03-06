@@ -46,7 +46,7 @@ setup_commands(3).command = attitude_cmd(hover_thrust, 0, 0, 0);
 setup_commands(3).duration = 5; 
 
 setup_commands(4).name = 'Start Logging';
-setup_commands(4).command = 'log test_0 o_attitude mixer attitude_ctr_test';
+setup_commands(4).command = 'log test_0 o_attitude flight_ctr attitude_ctr_test';
 setup_commands(4).duration = 1;
 
 %% Teardown commands

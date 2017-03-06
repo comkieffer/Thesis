@@ -31,7 +31,7 @@ function process_test_data(test_name, sd_path)
         error('Unable to locate test data file at %s', sd_data_file);
     end
     
-    [this_folder, ~, ~] = fileparts(which('process_test_data'));
+%     [this_folder, ~, ~] = fileparts(which('process_test_data'));
 %     sd_data_file = fullfile(this_folder, [test_name '.txt']);
     
     % Move the data file to the results folder
@@ -75,7 +75,9 @@ function process_test_data(test_name, sd_path)
  
     % Finally we can generate the .mat file from all of this data
     cd(parsed_logs_folder);
-    matlabify_data(test_name)
+    matlabify_data(test_name);
+    
+    resize_data(test_name);
     
     new_data_folder = fullfile(log_folder, 'parsed_logs');
     fprintf('\nMoving generated files into log directory: %s\n', new_data_folder);
@@ -430,6 +432,47 @@ function matlabify_data(test_name)
     end
        
     clear -regexp file$ data$
+    save(test_name);
+end
+
+function resize_data(test_name)
+    data = load([test_name, '.mat']);
+    
+    data_fields = fieldnames(data); 
+    data_len = [];
+    for k = 1:length(data_fields)
+       if ~strcmp(data_fields{k}, 'test_name')
+            data_len(end+1) = length(data.(data_fields{k}));
+       end
+    end
+    min_data_len = min(data_len);
+    max_data_len = max(data_len);
+    
+    fprintf('\nChecking dataset lengths ...\n');
+    fprintf('  - Shortest data sequence is %i points long\n', min_data_len);
+    fprintf('  - Longest data sequence is %i points long\n', max_data_len);
+    
+    if min_data_len ~= max_data_len
+        warning('Some data set sizes vary. All datasets will be truncated to %i points', min_data_len);
+        
+        for k = 1:length(data_fields)
+            if ~strcmp(data_fields{k}, 'test_name')
+                data.(data_fields{k}) = data.(data_fields{k})(1:min_data_len);
+            end
+        end
+
+        save_struct(data, test_name); 
+    end
+end
+
+function save_struct(data, test_name)
+    fields__ = fieldnames(data);
+    
+    for k = 1:length(fields__)
+       eval(sprintf('%s = data.%s;', fields__{k}, fields__{k})); 
+    end
+    
+    clear fields__ k data;
     save(test_name);
 end
 
