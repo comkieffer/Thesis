@@ -114,6 +114,7 @@ function adjust_yticks(axis)
     % we use the max, min and mid-point of the YData.
     if length(axis.YTick) > 3
         axis.YTickLabel{1} = ' ';
+        axis.YTickLabel{end} = ' ';
     else
         % The axis contains |Line| objects that contain the actual data.
         % We want the maximum and minimum of all the data points in the
@@ -123,5 +124,6 @@ function adjust_yticks(axis)
         mid_point   = (upper_bound + lower_bound) / 2; 
 
         axis.YTick = [lower_bound, mid_point, upper_bound];
+        axis.YTickLabel = num2str(axis.YTcik);
     end
 end
