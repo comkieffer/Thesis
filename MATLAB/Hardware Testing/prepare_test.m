@@ -84,6 +84,12 @@ function prepare_test(test_name)
     
     fprintf('\n');
     fprintf('Creating new folder for scripts & results: %s\n', test_folder);
+    if exist(test_folder, 'dir') 
+        if ~yes_no_prompt(sprintf('The test folder %s already exists. Do you want to overwrite it ?', test_folder))
+            return
+        end
+    end
+    
     mkdir_safe(test_folder);
     
     fprintf('Generating Attitude_quadrotor.cpp file ...\n');
@@ -101,6 +107,13 @@ function prepare_test(test_name)
 
     template = LTemplate.load('templates/Attitude_quadrotor.cpp.tpl');
     code = template.render(parameters);
+    
+    parameters.inner_ref_model = evalin('base', 'InnerReferenceModel');
+    parameters.outer_ref_model = evalin('base', 'OuterReferenceModel');
+    parameters.inner_bw = evalin('base', 'inner_bw');
+    parameters.inner_damp = evalin('base', 'inner_damp');
+    parameters.outer_bw = evalin('base', 'outer_bw');
+    parameters.outer_damp = evalin('base', 'outer_damp');
     
     controller_file = fullfile(test_folder, 'Attitude_quadrotor.cpp');
     fprintf('Writing new controller to %s\n', controller_file);
@@ -128,6 +141,9 @@ function prepare_test(test_name)
     addpath(test_folder);
     
     fprintf('\nTest Ready. After running the test use ''process_test_data'' to process the test data\n'); 
+    
+    % Open up the script file to make it easy to run.
+    edit script_file;
 end
 
 function result = yes_no_prompt(message)

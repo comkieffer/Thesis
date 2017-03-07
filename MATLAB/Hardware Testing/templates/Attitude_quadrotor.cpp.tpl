@@ -3,8 +3,8 @@
  * 
  * Test Configuration: 
  *  - Test Name: {{ test_name }}
- *  - Inner Loop: Kp = {{ Kp_pitch }}, Ki = {{ Ki_pitch }}, Kd = {{ Kd_pitch }}
- *  - Outer Loop: Kp = {{ Kp_q }}, Ki = {{ Ki_q }}, Kd = {{ Kd_q }}, Kb = {{ Kb_q }}
+ *  - Outer Loop: Kp = {{ Kp_pitch }}, Ki = {{ Ki_pitch }}, Kd = {{ Kd_pitch }}
+ *  - Inner Loop: Kp = {{ Kp_q }}, Ki = {{ Ki_q }}, Kd = {{ Kd_q }}, Kb = {{ Kb_q }}
  *
  * Academic License - for use in teaching, academic research, and meeting
  * course requirements at degree granting institutions only.  Not for

@@ -63,11 +63,16 @@ teardown_commands(1).duration = 5;
 
 teardown_commands(2).name = 'Stop Logging';
 teardown_commands(2).command = 'log stop';
-teardown_commands(2).duration = 1;
+teardown_commands(2).duration = 5;
 
 teardown_commands(3).name = 'Power Down Motors';
 teardown_commands(3).command = 'test attitude_ctr_test stop';
 teardown_commands(3).duration = 1;
+
+teardown_commands(4).name = 'Finish Test';
+teardown_commands(4).command = 'sim_raspy stop';
+teardown_commands(4).duration = 1;
+
 
 %% Test commands
 %

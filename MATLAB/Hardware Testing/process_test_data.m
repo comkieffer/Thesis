@@ -6,6 +6,9 @@
 % The data file should be at sd_path/test_name
 % 
 
+% Suppress unused variable messages
+%#ok<*NASGU>
+
 function process_test_data(test_name, sd_path)
     
     % ensure that we return to the starting directory on failure. 
@@ -50,9 +53,7 @@ function process_test_data(test_name, sd_path)
     copyfile(sd_data_file, log_file_destination); 
     
     %% Step 2 - Parse the results
-    
-    [log_folder, ~, ~] = fileparts(log_file_destination); 
-    
+        
     % First we need to find the java binary that parses the log
     parser_executable = which('logParser.jar');
     [parser_folder, ~, ~] = fileparts(parser_executable);
@@ -75,11 +76,17 @@ function process_test_data(test_name, sd_path)
  
     % Finally we can generate the .mat file from all of this data
     cd(parsed_logs_folder);
+    
+    % Parse the data from the txt file and produce a cool mat file
     matlabify_data(test_name);
     
+    % Ensure that all data sequences have the same length
     resize_data(test_name);
     
-    new_data_folder = fullfile(log_folder, 'parsed_logs');
+    remove_spurious_measurements(test_name, 7);
+    
+    % Move all the files into the test_results folder
+    new_data_folder = fullfile(base_folder, 'parsed_logs');
     fprintf('\nMoving generated files into log directory: %s\n', new_data_folder);
     if exist(new_data_folder, 'dir') 
         if yes_no_prompt('Output log folder already exists. Overwrite')
@@ -91,11 +98,20 @@ function process_test_data(test_name, sd_path)
         
     movefile(parsed_logs_folder, new_data_folder, 'f'); 
     
+    % Add the folder to the path so that we can locaate the mat file
     fprintf('\nAdding test folder %s to path\n', new_data_folder);
     addpath(new_data_folder);
     
+    % Return home
     cd(initial_folder);
     make_dashboard(test_name);
+    print(fullfile(base_folder, [test_name '.png']), '-dpng'); 
+    
+    % everything has completed successfully. We rename the data file on the SD
+    % card to back it up. 
+    new_sd_data_file = fullfile(sd_path, [test_name '.txt']);
+    fprintf('\nRenaming SD data file to: %s\n', new_sd_data_file); 
+    movefile(sd_data_file, new_sd_data_file);
     
 end
 
@@ -140,12 +156,12 @@ function matlabify_data(test_name)
     if exist(o_attitude_file, 'file') 
         o_attitude_data = dlmread(o_attitude_file);
         
-        o_attitude_roll = remove_spurious_measurements(o_attitude_data(:,1), 5);
-        o_attitude_pitch = remove_spurious_measurements(o_attitude_data(:,2), 5);
-        o_attitude_yaw = remove_spurious_measurements(o_attitude_data(:,3), 5);
-        o_attitude_p = remove_spurious_measurements(o_attitude_data(:,4), 5);
-        o_attitude_q = remove_spurious_measurements(o_attitude_data(:,5), 5);
-        o_attitude_r = remove_spurious_measurements(o_attitude_data(:,6), 5);
+        o_attitude_roll = o_attitude_data(:,1);
+        o_attitude_pitch = o_attitude_data(:,2);
+        o_attitude_yaw = o_attitude_data(:,3);
+        o_attitude_p = o_attitude_data(:,4);
+        o_attitude_q = o_attitude_data(:,5);
+        o_attitude_r = o_attitude_data(:,6);
         o_attitude_state = o_attitude_data(:,7);
 
         disp([' - ON_ATTITUDE',10,9,...
@@ -175,7 +191,7 @@ function matlabify_data(test_name)
     if exist(o_pos_body_file, 'file')
         o_pos_body_data = dlmread(o_pos_body_file);
 
-        o_pos_body_x = o_pos_body_data(:,1);
+        o_pos_body_x = o_pos_body_data(:,1); %#ok<*NASGU>
         o_pos_body_u = o_pos_body_data(:,2);
         o_pos_body_u_dot = o_pos_body_data(:,3);
         o_pos_body_y = o_pos_body_data(:,4);
@@ -376,7 +392,7 @@ function matlabify_data(test_name)
     end
 
     heartbeat_file = strcat(test_name, '-HEARTBEAT.txt');
-    if exist(heartbeat_file)
+    if exist(heartbeat_file, 'file')
         heartbeat_data = dlmread(heartbeat_file);
 
         heartbeat_mode = heartbeat_data(:,1);
@@ -465,14 +481,14 @@ function resize_data(test_name)
     end
 end
 
-function save_struct(data, test_name)
-    fields__ = fieldnames(data);
+function save_struct(data__, test_name)
+    fields__ = fieldnames(data__);
     
-    for k = 1:length(fields__)
-       eval(sprintf('%s = data.%s;', fields__{k}, fields__{k})); 
+    for k__ = 1:length(fields__)
+       eval(sprintf('%s = data__.%s;', fields__{k__}, fields__{k__})); 
     end
     
-    clear fields__ k data;
+    clear fields__ data__ k__;
     save(test_name);
 end
 
@@ -481,9 +497,27 @@ function result = yes_no_prompt(message)
     result = strcmp(s, 'y');
 end
 
-function new_data = remove_spurious_measurements(data, cutoff)
-    cutoff_value = std(data)*cutoff;
+function remove_spurious_measurements(test_name, cutoff)
+    data = load([test_name, '.mat']);
     
-    new_data = data; 
-    new_data(abs(data -mean(data)) > cutoff_value) = NaN;
+    data_fields = fieldnames(data); 
+    for k = 1:length(data_fields)
+        if ~strcmp(data_fields{k}, 'test_name')
+            dataset = data.(data_fields{k});
+            
+            cutoff_value = std(dataset)*cutoff;
+            if cutoff > .00001
+                dataset(abs(dataset -mean(dataset)) > cutoff_value) = NaN;
+            end
+            
+            spurious_points = sum(isnan(dataset));
+            if spurious_points > 0
+                warning('Removing %i spurious points from %s', spurious_points, data_fields{k});
+            end
+            
+            data.(data_fields{k}) = dataset;
+        end
+    end
+
+    save_struct(data, [test_name, '.mat']);
 end
