@@ -71,7 +71,7 @@ function process_test_data(test_name, sd_path)
     % main folder for analysis.
     parsed_logs_folder = fullfile(parser_folder, 'parsed_logs', test_name);
     if ~exist(parsed_logs_folder, 'dir')
-        error('Unable to locate ''parsed_logs'' directory.');
+        error('Unable to locate ''parsed_logs'' (%s) directory.', parsed_logs_folder);
     end
  
     % Finally we can generate the .mat file from all of this data

@@ -133,7 +133,7 @@ function prepare_test(test_name)
     template = LTemplate.load('templates/pitch_test.m.tpl');
     code = template.render(struct('test_name', test_name));
     
-    script_file = fullfile(test_folder, sprintf('pitch_%s.m', test_name));
+    script_file = fullfile(pwd, test_folder, sprintf('pitch_%s.m', test_name));
     fprintf('Writing new ''pitch_test'' script file to %s\n', script_file);
     fwrite_safe(script_file, 'w+', code);
     
@@ -143,7 +143,7 @@ function prepare_test(test_name)
     fprintf('\nTest Ready. After running the test use ''process_test_data'' to process the test data\n'); 
     
     % Open up the script file to make it easy to run.
-    edit script_file;
+    edit(sprintf('%s', script_file));
 end
 
 function result = yes_no_prompt(message)

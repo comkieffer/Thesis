@@ -129,5 +129,22 @@ function make_dashboard(test_name, comparator)
     condense_subplots_vertical([ax11, ax21]);
     condense_subplots_vertical([ax12, ax22, ax32]);
 
+    figure();
+        plot( ...
+            new_data_time_vec , new_test_data.o_attitude_pitch, ...
+            new_data_time_vec, rad2deg(new_test_data.attitude_ctr_test_p), 'g--' ...
+        ); grid minor;
+        if exist('base_test_data', 'var')
+            hold on; 
+            base_data_time_vec = [1:length(base_test_data.o_attitude_roll)] .* .01;
+            plot(base_data_time_vec, base_test_data.o_attitude_pitch)
+            legend('New VRFT', 'Set Point', comparator, 'Location', 'SouthEast');
+        else
+            legend('New VRFT', 'Set Point', 'Location', 'SouthEast');
+        end
+
+        title('Pitch')
+        ylabel('Angle (°)'); xlabel('Time (s)');
+    
 end
 
