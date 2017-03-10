@@ -7,14 +7,16 @@
 close all 
 clc
 
+test_name = 'test_3';
+
 %% User interface
 
 ports = instrhwinfo('serial');
-if isempty(ports)
+if isempty(ports.AvailableSerialPorts)
    error('Unable to locate any available serial port');
 end
 
-SerialPort = ports.SerialPorts{1};
+SerialPort = ports.AvailableSerialPorts{1};
 fprintf('Using serial: %s\n\n', SerialPort);
 
 %% Initialization of serial communication
@@ -38,9 +40,6 @@ hover_thrust = -10;
 attitude_cmd = @(h, p, q, r) ...
     sprintf('test attitude_ctr_test %.4f %.4f %.4f %.4f', h, p, q, r);
 
-attitude_distrub_cmd @(h, p, q, r, d1, d2, d3, d4) ...
-    sprintf('%s %.4f %.4f %.4f %.4f', attitude_cmd(h, p, q, r), d1, d2, d3, d4); 
-
 setup_commands = struct([]); 
 
 setup_commands(1).name = 'Calibrate';
@@ -56,7 +55,7 @@ setup_commands(3).command = attitude_cmd(hover_thrust, 0, 0, 0);
 setup_commands(3).duration = 5; 
 
 setup_commands(4).name = 'Start Logging';
-setup_commands(4).command = 'log test_0 o_attitude flight_ctr attitude_ctr_test';
+setup_commands(4).command = sprintf('log %s o_attitude flight_ctr attitude_ctr_test', test_name);
 setup_commands(4).duration = 1;
 
 %% Teardown commands
@@ -92,30 +91,48 @@ step_duration = 20;
 test_commands = struct([]);
 
 % + 5° Step cycle
-
 test_commands(1).name = '0° Hold';
 test_commands(1).command = attitude_cmd(hover_thrust, 0, 0, 0);
 test_commands(1).duration = step_duration;
 
-test_commands(2).name = '-10% disturbance FRONT';
-test_commands(2).command = attitude_disturb_cmd(hover_thrust, 0, 0, 0, -10, -10, 0, 0);
+test_commands(2).name = '+5° Step';
+test_commands(2).command = attitude_cmd(hover_thrust, 0, deg2rad(5), 0);
 test_commands(2).duration = step_duration;
 
-test_commands(3).name = '0° Hold';
-test_commands(3).command = attitude_cmd(hover_thrust, 0, 0, 0);
+test_commands(3).name = '-5° Step';
+test_commands(3).command = attitude_cmd(hover_thrust, 0, deg2rad(-5), 0);
 test_commands(3).duration = step_duration;
 
-test_commands(4).name = '-10% disturbance FRONT';
-test_commands(4).command = attitude_disturb_cmd(hover_thrust, 0, 0, 0, -10, -10, 0, 0);
+% +10° step cycle
+test_commands(4).name = '0° Hold';
+test_commands(4).command = attitude_cmd(hover_thrust, 0, 0, 0);
 test_commands(4).duration = step_duration;
 
-test_commands(5).name = '0° Hold';
-test_commands(5).command = attitude_cmd(hover_thrust, 0, 0, 0);
+test_commands(5).name = '+10° Step';
+test_commands(5).command = attitude_cmd(hover_thrust, 0, deg2rad(10), 0);
 test_commands(5).duration = step_duration;
 
-test_commands(6).name = '-10% disturbance FRONT';
-test_commands(6).command = attitude_disturb_cmd(hover_thrust, 0, 0, 0, -10, -10, 0, 0);
+test_commands(6).name = '-10° Step';
+test_commands(6).command = attitude_cmd(hover_thrust, 0, deg2rad(-10), 0);
 test_commands(6).duration = step_duration;
+
+% +15° step cycle
+test_commands(7).name = '0° Hold';
+test_commands(7).command = attitude_cmd(hover_thrust, 0, 0, 0);
+test_commands(7).duration = step_duration;
+
+test_commands(8).name = '+15° Step';
+test_commands(8).command = attitude_cmd(hover_thrust, 0, deg2rad(15), 0);
+test_commands(8).duration = step_duration;
+
+test_commands(9).name = '-15° Step';
+test_commands(9).command = attitude_cmd(hover_thrust, 0, deg2rad(-15), 0);
+test_commands(9).duration = step_duration;
+
+% Go home and stay there for a while
+test_commands(10).name = '0° Hold';
+test_commands(10).command = attitude_cmd(hover_thrust, 0, 0, 0);
+test_commands(10).duration = step_duration;
 
 %% Run the test
 

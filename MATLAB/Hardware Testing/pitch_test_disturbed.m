@@ -8,14 +8,21 @@ close all
 clc
 
 %% User interface
-SerialPort = '/dev/ttyACM0';
+
+ports = instrhwinfo('serial');
+if isempty(ports.SerialPorts)
+   error('Unable to locate any available serial port');
+end
+
+SerialPort = ports.SerialPorts{1};
+fprintf('Using serial: %s\n\n', SerialPort);
 
 %% Initialization of serial communication
 %Serial parameters and functions
 
 % Close old serial port if it is still open 
 try
-    fclose(instrfind);
+    fclose(instrfindall);
 catch
     disp('Problem using fclose... Opening a serial COM first.');
 end
@@ -29,7 +36,10 @@ end
 hover_thrust = -10;
 
 attitude_cmd = @(h, p, q, r) ...
-    sprintf('test attitude_ctr_test %.4f %.4f %.4f %.4f', h, p, q, r);
+    sprintf('test attitude_ctr_test %.2f %.2f %.2f %.2f', h, p, q, r);
+
+attitude_disturb_cmd = @(h, p, q, r, d1, d2, d3, d4) ...
+    sprintf('%s %i %i %i %i', attitude_cmd(h, p, q, r), d1, d2, d3, d4); 
 
 setup_commands = struct([]); 
 
@@ -46,7 +56,7 @@ setup_commands(3).command = attitude_cmd(hover_thrust, 0, 0, 0);
 setup_commands(3).duration = 5; 
 
 setup_commands(4).name = 'Start Logging';
-setup_commands(4).command = 'log test_0 o_attitude mixer attitude_ctr_test';
+setup_commands(4).command = 'log test_1 o_attitude flight_ctr attitude_ctr_test';
 setup_commands(4).duration = 1;
 
 %% Teardown commands
@@ -63,25 +73,49 @@ teardown_commands(1).duration = 5;
 
 teardown_commands(2).name = 'Stop Logging';
 teardown_commands(2).command = 'log stop';
-teardown_commands(2).duration = 1;
+teardown_commands(2).duration = 5;
 
 teardown_commands(3).name = 'Power Down Motors';
 teardown_commands(3).command = 'test attitude_ctr_test stop';
 teardown_commands(3).duration = 1;
 
+teardown_commands(4).name = 'Finish Test';
+teardown_commands(4).command = 'sim_raspy stop';
+teardown_commands(4).duration = 1;
+
+
 %% Test commands
 %
 % This is where the test actually happens
 
+step_duration = 10;
 test_commands = struct([]);
 
-test_commands(1).name = 'Set Attitude Home';
-test_commands(1).command = attitude_cmd(hover_thrust, 0, deg2rad(15), 0);
-test_commands(1).duration = 10;
+% + 5° Step cycle
 
-test_commands(2).name = 'Set Attitude Home';
-test_commands(2).command = attitude_cmd(hover_thrust, 0, deg2rad(-15), 0);
-test_commands(2).duration = 10;
+test_commands(1).name = '0° Hold';
+test_commands(1).command = attitude_cmd(hover_thrust, 0, 0, 0);
+test_commands(1).duration = step_duration;
+
+test_commands(2).name = '-10% disturbance FRONT';
+test_commands(2).command = attitude_disturb_cmd(hover_thrust, 0, 0, 0, -10, -10, 0, 0);
+test_commands(2).duration = step_duration;
+
+test_commands(3).name = '0° Hold';
+test_commands(3).command = attitude_cmd(hover_thrust, 0, 0, 0);
+test_commands(3).duration = step_duration;
+
+test_commands(4).name = '-10% disturbance FRONT';
+test_commands(4).command = attitude_disturb_cmd(hover_thrust, 0, 0, 0, -10, -10, 0, 0);
+test_commands(4).duration = step_duration;
+
+test_commands(5).name = '0° Hold';
+test_commands(5).command = attitude_cmd(hover_thrust, 0, 0, 0);
+test_commands(5).duration = step_duration;
+
+test_commands(6).name = '-10% disturbance FRONT';
+test_commands(6).command = attitude_disturb_cmd(hover_thrust, 0, 0, 0, -10, -10, 0, 0);
+test_commands(6).duration = step_duration;
 
 %% Run the test
 
