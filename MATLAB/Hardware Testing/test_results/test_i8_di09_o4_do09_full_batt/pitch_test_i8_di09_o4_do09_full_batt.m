@@ -88,47 +88,47 @@ teardown_commands(4).duration = 1;
 step_duration = 20;
 test_commands = struct([]);
 
-% + 5° Step cycle
-test_commands(1).name = '0° Hold';
+% + 5Â° Step cycle
+test_commands(1).name = '0Â° Hold';
 test_commands(1).command = attitude_cmd(hover_thrust, 0, 0, 0);
 test_commands(1).duration = step_duration;
 
-test_commands(2).name = '+5° Step';
+test_commands(2).name = '+5Â° Step';
 test_commands(2).command = attitude_cmd(hover_thrust, 0, deg2rad(5), 0);
 test_commands(2).duration = step_duration;
 
-test_commands(3).name = '-5° Step';
+test_commands(3).name = '-5Â° Step';
 test_commands(3).command = attitude_cmd(hover_thrust, 0, deg2rad(-5), 0);
 test_commands(3).duration = step_duration;
 
-% +10° step cycle
-test_commands(4).name = '0° Hold';
+% +10Â° step cycle
+test_commands(4).name = '0Â° Hold';
 test_commands(4).command = attitude_cmd(hover_thrust, 0, 0, 0);
 test_commands(4).duration = step_duration;
 
-test_commands(5).name = '+10° Step';
+test_commands(5).name = '+10Â° Step';
 test_commands(5).command = attitude_cmd(hover_thrust, 0, deg2rad(10), 0);
 test_commands(5).duration = step_duration;
 
-test_commands(6).name = '-10° Step';
+test_commands(6).name = '-10Â° Step';
 test_commands(6).command = attitude_cmd(hover_thrust, 0, deg2rad(-10), 0);
 test_commands(6).duration = step_duration;
 
-% +15° step cycle
-test_commands(7).name = '0° Hold';
+% +15Â° step cycle
+test_commands(7).name = '0Â° Hold';
 test_commands(7).command = attitude_cmd(hover_thrust, 0, 0, 0);
 test_commands(7).duration = step_duration;
 
-test_commands(8).name = '+15° Step';
+test_commands(8).name = '+15Â° Step';
 test_commands(8).command = attitude_cmd(hover_thrust, 0, deg2rad(15), 0);
 test_commands(8).duration = step_duration;
 
-test_commands(9).name = '-15° Step';
+test_commands(9).name = '-15Â° Step';
 test_commands(9).command = attitude_cmd(hover_thrust, 0, deg2rad(-15), 0);
 test_commands(9).duration = step_duration;
 
 % Go home and stay there for a while
-test_commands(10).name = '0° Hold';
+test_commands(10).name = '0Â° Hold';
 test_commands(10).command = attitude_cmd(hover_thrust, 0, 0, 0);
 test_commands(10).duration = step_duration;
 

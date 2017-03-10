@@ -94,6 +94,9 @@ test_commands(2).duration = 10;
 drone_serial = serial(SerialPort, 'BaudRate', 57600, 'DataBits', 8, 'Terminator', 'CR/LF');
 fopen(drone_serial);
 
+pause(5);
+
+
 draw_boxed_text('Setup In Progress'); 
 for k = 1:length(setup_commands)
     run_command(drone_serial, setup_commands(k))
