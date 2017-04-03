@@ -128,6 +128,8 @@ function make_dashboard(test_name, comparator)
             
     condense_subplots_vertical([ax11, ax21]);
     condense_subplots_vertical([ax12, ax22, ax32]);
+    
+    print -dpng test_name;
 
     figure();
         plot( ...

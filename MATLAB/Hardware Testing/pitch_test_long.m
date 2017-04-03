@@ -7,7 +7,7 @@
 close all 
 clc
 
-test_name = 'test_3';
+test_name = 'test_0';
 
 %% User interface
 
@@ -35,7 +35,7 @@ end
 % These commands will be run before the test starts and take care of
 % configuring the drone, starting the logging and powering the motors
 
-hover_thrust = -10;
+hover_thrust = -14.8131;
 
 attitude_cmd = @(h, p, q, r) ...
     sprintf('test attitude_ctr_test %.4f %.4f %.4f %.4f', h, p, q, r);

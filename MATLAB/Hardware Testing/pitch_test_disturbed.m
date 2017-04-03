@@ -56,7 +56,7 @@ setup_commands(3).command = attitude_cmd(hover_thrust, 0, 0, 0);
 setup_commands(3).duration = 5; 
 
 setup_commands(4).name = 'Start Logging';
-setup_commands(4).command = 'log test_1 o_attitude flight_ctr attitude_ctr_test';
+setup_commands(4).command = 'log test_0 o_attitude flight_ctr attitude_ctr_test';
 setup_commands(4).duration = 1;
 
 %% Teardown commands
@@ -116,6 +116,10 @@ test_commands(5).duration = step_duration;
 test_commands(6).name = '-10% disturbance FRONT';
 test_commands(6).command = attitude_disturb_cmd(hover_thrust, 0, 0, 0, -10, -10, 0, 0);
 test_commands(6).duration = step_duration;
+
+test_commands(7).name = '0° Hold';
+test_commands(7).command = attitude_cmd(hover_thrust, 0, 0, 0);
+test_commands(7).duration = step_duration;
 
 %% Run the test
 

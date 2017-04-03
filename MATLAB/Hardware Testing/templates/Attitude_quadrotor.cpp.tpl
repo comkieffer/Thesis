@@ -616,6 +616,24 @@ Attitude_quadrotorModelClass::Attitude_quadrotorModelClass()
                                         *   '<S7>/Filter Coefficient'
                                         *   '<S8>/Filter Coefficient'
                                         */
+    {{ Kd_pitch }},                    /* Variable: KD_PITCH, Orig: 0.00512
+                                        * Referenced by: '<S3>/Derivative Gain'
+                                        */
+    {{ Kd_q }},                        /* Variable: KD_Q, Orig: 0.0499
+                                        * Referenced by: '<S7>/Derivative Gain'
+                                        */
+    {{ Kp_pitch }},                    /* Variable: KP_PITCH, Orig: 2.0
+                                        * Referenced by: '<S3>/Proportional Gain'
+                                        */
+    {{ Kp_q }},                        /* Variable: KP_Q:, 0.298
+                                        * Referenced by: '<S7>/Proportional Gain'
+                                        */
+    {{ Ki_pitch }},                    /* Variable: KI_PITCH, Orig: 0.0
+                                        * Referenced by: '<S3>/Integral Gain'
+                                        */
+    {{ Ki_q }},                        /* Variable: KI_Q, Orig: 0.304
+                                        * Referenced by: '<S7>/Integral Gain'
+                                        */
     0.40514779629427244,               /* Variable: KB_P
                                         * Referenced by: '<S6>/Kb'
                                         */
@@ -627,12 +645,6 @@ Attitude_quadrotorModelClass::Attitude_quadrotorModelClass()
                                         */
     0.0499,                            /* Variable: KD_P
                                         * Referenced by: '<S6>/Derivative Gain'
-                                        */
-    {{ Kd_pitch }},                    /* Variable: KD_PITCH, Orig: 0.00512
-                                        * Referenced by: '<S3>/Derivative Gain'
-                                        */
-    {{ Kd_q }},                        /* Variable: KD_Q, Orig: 0.0499
-                                        * Referenced by: '<S7>/Derivative Gain'
                                         */
     0.00584,                           /* Variable: KD_R
                                         * Referenced by: '<S8>/Derivative Gain'
@@ -646,12 +658,6 @@ Attitude_quadrotorModelClass::Attitude_quadrotorModelClass()
     0.304,                             /* Variable: KI_P
                                         * Referenced by: '<S6>/Integral Gain'
                                         */
-    {{ Ki_pitch }},                    /* Variable: KI_PITCH, Orig: 0.0
-                                        * Referenced by: '<S3>/Integral Gain'
-                                        */
-    {{ Ki_q }},                        /* Variable: KI_Q, Orig: 0.304
-                                        * Referenced by: '<S7>/Integral Gain'
-                                        */
     0.0389,                            /* Variable: KI_R
                                         * Referenced by: '<S8>/Integral Gain'
                                         */
@@ -664,12 +670,7 @@ Attitude_quadrotorModelClass::Attitude_quadrotorModelClass()
     0.298,                             /* Variable: KP_P
                                         * Referenced by: '<S6>/Proportional Gain'
                                         */
-    {{ Kp_pitch }},                    /* Variable: KP_PITCH, Orig: 2.0
-                                        * Referenced by: '<S3>/Proportional Gain'
-                                        */
-    {{ Kp_q }},                        /* Variable: KP_Q:, 0.298
-                                        * Referenced by: '<S7>/Proportional Gain'
-                                        */
+
     0.135,                             /* Variable: KP_R
                                         * Referenced by: '<S8>/Proportional Gain'
                                         */

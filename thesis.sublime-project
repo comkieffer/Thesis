@@ -5,11 +5,13 @@
             "path": "Diary/content",
             "name": "Diary"
         }, {
-            "path": "Latex",
+            "path": "Thesis-Report",
             "name": "Thesis",
 
             "file_exclude_patterns": [
-                "*.synctex.gz", "*.aux", "*.fls", "*.log"
+                "*.synctex.gz", "*.aux", "*.bbl", "*.bcf", "*.blg", "*.fdb_latexmk", "*.lof", 
+                "*.lot", "*.ptex", "*.run.xml", "*.toc", "*.fls", "*.log", "*.dep", "*.md5", 
+                "*.dpth", ".*", "Figures/*.pdf"
             ]
         }, {
 			"path": ".",
@@ -29,6 +31,6 @@
 	], 
 
     "options": {
-        "root": "Latex/main.tex"
+        "root": "Thesis-Report/main.tex"
     }
 }

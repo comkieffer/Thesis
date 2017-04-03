@@ -2,7 +2,7 @@
 load 'quad_copter_models.mat';
 
 
-dampings = .1:.1:1;
+dampings = .6:.1:1;
 bandwidths = 1:1:40;
 
 all_rows = struct();
@@ -15,14 +15,18 @@ for d = dampings
     for bw = bandwidths 
        [Kp, Ki, Kd, Tf] = run_inner_vrft_bf(bw, d);
        
-       all_rows(all_rows_idx).bandwidth = bw;
-       all_rows(all_rows_idx).damping = d;
-       all_rows(all_rows_idx).Kp = Kp;
-       all_rows(all_rows_idx).Ki = Ki;
-       all_rows(all_rows_idx).Kd = Kd;
-       all_rows(all_rows_idx).Tf = Tf;
-       
-       all_rows_idx = all_rows_idx + 1;
+        try
+            d2c(pid(Kp, Ki, Kd, Tf, .01);
+           all_rows(all_rows_idx).bandwidth = bw;
+           all_rows(all_rows_idx).damping = d;
+           all_rows(all_rows_idx).Kp = Kp;
+           all_rows(all_rows_idx).Ki = Ki;
+           all_rows(all_rows_idx).Kd = Kd;
+           all_rows(all_rows_idx).Tf = Tf;
+
+           all_rows_idx = all_rows_idx + 1;
+       catch
+       end
     end 
 end
 

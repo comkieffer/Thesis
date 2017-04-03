@@ -17,8 +17,8 @@ Mixer = tf(66.6667, ...
     'InputName', 'dM', 'OutputName', 'd\Omega');
 
 Tf = .01;
-Ri = pid(.3, .3, .05, Tf, ...
-    'InputName', 'e_i', 'OutputName', 'dM');
+% Ri = pid(.3, .3, .05, Tf, 'InputName', 'e_i', 'OutputName', 'dM'); Old
+Ri = pid(.298, .304, .0499, Tf, 'InputName', 'e_i', 'OutputName', 'dM');
 
 icloop = loopsens(PitchRateModel * Mixer, Ri);
 InnerLoop_Hinf = tf(icloop.Ti);
@@ -27,7 +27,8 @@ InnerLoop_Hinf.OutputName = 'q';
 
 %% Outer Loop & H_inf Regulator
 
-Ro = pid(1.61, 0, .00512, .01); 
+% Ro = pid(1.61, 0, .00512, .01); Old
+Ro = pid(2.0, 0, 0.00522, Tf);
 
 integrator = tf(1, [1, 0]); 
 integrator_dt = c2d(integrator, Ts);
