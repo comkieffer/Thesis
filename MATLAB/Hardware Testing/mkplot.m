@@ -1,4 +1,6 @@
 
+% Simple helper to plot a value from one of the data files
+
 function mkplot(test_name, datasets)
     
     data_mat_file = which([test_name '.mat']);

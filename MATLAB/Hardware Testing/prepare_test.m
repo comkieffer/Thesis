@@ -27,7 +27,7 @@
 % accessible format.
 %
 % Once the test has been run you can retrieve the data from the SD card by
-% running |process_test_data|. This tool will grab the test data file frm the
+% running |process_test_data|. This tool will grab the test data file from the
 % SD card and move it into the appropriate test folder.
 %
 % The tool will then run the parser on the file and retrieve the parsed log

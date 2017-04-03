@@ -3,9 +3,17 @@
 % Locate the test data on the specified SD Card and move into the dedicated
 % test folder so that it can be processed and converted to a matlab file. 
 %
-% The data file should be at sd_path/test_name
+% PARAMETERS:
+%   test_name: The name of the test. This is used to locate the appropriate
+%       test folder into which the parsed logs will be written.
+%   sd_path: The path to the sd card. On Linux this should eb something
+%   |/media/username/sdcardname/|.
 % 
-
+% COMMENTS: 
+%   Yes, this script is overcomplciated. Blame the shitty java parser that
+%   just spits out files in its own directory instead of providing a sane way
+%   of specifying where they should be written.
+%   
 % Suppress unused variable messages
 %#ok<*NASGU>
 

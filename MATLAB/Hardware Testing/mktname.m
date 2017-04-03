@@ -1,4 +1,18 @@
 
+%
+% Make Test Name
+%
+% Small utility to generate a test name from the parameters of the reference
+% models. The suffix allows you to add (duh!) a suffix to the name.
+%
+% USAGE:
+%   >> mktname(8, .7, 9, .8, '_disturbed')
+%   ans =
+%   test_i8_di07_o9_do08_disturbed
+%
+
+
+
 function test_name = mktname(inner_bw, inner_damp, outer_bw, outer_damp, suffix)
     if nargin == 0
         inner_bw = evalin('base', 'inner_bw');
