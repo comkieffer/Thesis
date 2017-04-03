@@ -3,6 +3,13 @@
 % To simplify further development of the VRFT control algorithms we group here
 % all the different models that we might need. 
 %
+% Here we create all the variables we need later on:
+%
+% - Transfer functions for the models, regulators and closed loops
+% - Utility methods like mk_2nd_order
+% - Pieces of data like Tf, Ts
+% - The controller classes for PD and PID controllers
+%
 
 %% Inner Loop & H_inf Regulator
 Ts = .01;

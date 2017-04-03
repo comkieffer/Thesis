@@ -21,7 +21,7 @@ function startup()
 
     % Now we can start loading the subdirectories in the current folder. 
 
-    MATLAB_EXTENSIONS = {'.m', '.p' '.mlx'};
+    MATLAB_EXTENSIONS = {'.m', '.p' '.mlx', '.mat'};
     SIMULINK_EXTENSIONS = {'.slx'};
 
 

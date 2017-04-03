@@ -1,13 +1,34 @@
 
-% TODO: check that the axis ticks are the same on every plot
+
+%
+% Reduce vertical spacing between plots.
+%
+% When plotting multiple datasets with the same x axis there is no need to
+% repeat the x axis tcks and labels. Addign them once to the bottomost plot is
+% suffcient. This script does precisely that. 
+%
+% USAGE: 
+%
+% figure()
+%   ax1 = subplot(2, 1, 1)
+%       plot(1:100, sin(1:100 / 10)); 
+%   ax2 = subplot(2, 1, 2)
+%       plot(1:100, cos(1:100 / 10)); 
+%   
+% condense_subplots_vertical([ax1, ax2]);
+%
+%
+% PARAMETERS:
+%
+% plots: A vector of axes to consider (e.g. [ax1, ax2,])
+% padding: The padding between adjacent plots (default: 0.02)
+%
+ 
 
 function condense_subplots_vertical(varargin)
     ip = inputParser(); 
     ip.addRequired('plots'); % @isnumeric
-    ip.addOptional('handle', gcf()); % @ishandle 
     ip.addParameter('padding', .02); % @isnumeric, iscalar
-    ip.addParameter('tight', true); % @isbool
-    ip.addParameter('fixlabels', false); % @isbool
     ip.parse(varargin{:});
     
     if isempty(ip.Results.plots) 
@@ -39,13 +60,12 @@ function condense_subplots_vertical(varargin)
        this_plot = plots(k);
 %        fprintf('Plot %i Initial Pos: [%.2f, %.2f, %.2f, %.2f]\n', k, this_plot.Position);
        
-       if ip.Results.tight && this_plot ~= bottom_plot
+       if this_plot ~= bottom_plot
            this_plot.XTickLabel = {};
            this_plot.XLabel.String = {};
            
-           if ip.Results.fixlabels 
-                adjust_yticks(this_plot);
-           end
+           adjust_yticks(this_plot);
+           
        end
        
        this_plot.Position =[

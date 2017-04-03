@@ -1,4 +1,14 @@
 
+%
+% This script is an abomination. Yes. I know. 
+%
+% The objective here is to brute force the optimal position of the zero we add
+% to the inner loop to mkae the high-frequency slope accurate. Yes, this is a
+% terrible idea and I would probably have been better served by setting the
+% inner weighting to some kind of low pass filter.
+%
+% Hindsight is 20/20. Sue me. 
+%
 
 poles = 5:1:100;
 inner_bw = 10;
