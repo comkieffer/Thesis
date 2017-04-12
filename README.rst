@@ -2,7 +2,7 @@
 Data-driven attitude control design for multirotor UAVs
 =======================================================
 
-This is the code used for my thesis. An up-to-date version of the final report is available `here <thesis>`_. In this work I applied `Virtual Reference Feedback Tuning <vrft>`_ to a multirotor UAV. The ``MATLAB`` toolbox is available `here <vrft_toolbox>`_.
+This is the code used for my thesis. An up-to-date version of the final report is available `here <http://thibaud.chupin.me/thesis>`_. In this work I applied `Virtual Reference Feedback Tuning <http://comkieffer.com/vrft>`_ to a multirotor UAV. The ``MATLAB`` toolbox is available `here <http://marco-campi.unibs.it/VRFTwebsite/>`_.
 
 In the ``Papers/`` folder you can find information on a variety of data-driven control methods. The papers on VRFT and CbT are particularly interesting especially the ``[VRFT, CbT]  Data-driven_attitude_control_law_of_a_variable-pitch_quadrotor_a_comparison_study.pdf`` paper that compares VRFT and CbT (spoiler: CbT is better for signals with a low signal to noise ratio). 
 
